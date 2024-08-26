@@ -1,7 +1,5 @@
 //pub fn serialize_ident(){}
-use proc_macro2::Ident;
-use serde::{Serialize, Serializer};
-use serde_json::Result;
+use serde::Serializer;
 //use crate::serialize::serialize_ident;
 // impl Serialize for proc_macro2::Ident {
 //     fn serialize<S>(&self,serializer:S)-> Result<S>
@@ -22,7 +20,7 @@ pub fn serialize_ident<S>(ident: &proc_macro2::Ident, serializer: S) -> std::res
 where
     S: serde::Serializer,
 {
-    let mut str_repr = ident.to_string();
+    let str_repr = ident.to_string();
     serializer.serialize_str(&str_repr)
 }
 

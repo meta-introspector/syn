@@ -5,7 +5,6 @@ use crate::path::{Path, QSelf};
 use crate::punctuated::Punctuated;
 use crate::token;
 use crate::ty::Type;
-use proc_macro2::TokenStream;
 
 pub use crate::expr::{
     ExprConst as PatConst, ExprLit as PatLit, ExprMacro as PatMacro, ExprPath as PatPath,

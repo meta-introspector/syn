@@ -6,7 +6,6 @@ use crate::path::Path;
 use crate::punctuated::{Iter, IterMut, Punctuated};
 use crate::token;
 use crate::ty::Type;
-use proc_macro2::TokenStream;
 #[cfg(all(feature = "printing", feature = "extra-traits"))]
 use std::fmt::{self, Debug};
 #[cfg(all(feature = "printing", feature = "extra-traits"))]
@@ -547,7 +546,7 @@ pub(crate) mod parsing {
     use crate::punctuated::Punctuated;
     use crate::token;
     use crate::ty::Type;
-    use crate::verbatim;
+    
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
     impl Parse for Generics {

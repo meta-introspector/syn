@@ -7,7 +7,6 @@ use crate::lifetime::Lifetime;
 use crate::punctuated::Punctuated;
 use crate::token;
 use crate::ty::{ReturnType, Type};
-use serde::{Serialize, Serializer};
 //use crate::serialize::serialize_ident;
 
 ast_struct! {

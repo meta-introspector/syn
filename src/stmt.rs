@@ -98,7 +98,7 @@ pub(crate) mod parsing {
     use crate::stmt::{Block, Local, LocalInit, Stmt, StmtMacro};
     use crate::token;
     use crate::ty::Type;
-    use proc_macro2::TokenStream;
+    
 
     struct AllowNoSemi(bool);
 

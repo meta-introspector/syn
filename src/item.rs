@@ -13,7 +13,6 @@ use crate::restriction::Visibility;
 use crate::stmt::Block;
 use crate::token;
 use crate::ty::{Abi, ReturnType, Type};
-use proc_macro2::TokenStream;
 #[cfg(feature = "parsing")]
 use std::mem;
 use serde::Serialize;
@@ -1046,7 +1045,7 @@ pub(crate) mod parsing {
     use crate::stmt::Block;
     use crate::token;
     use crate::ty::{Abi, ReturnType, Type, TypePath, TypeReference};
-    use crate::verbatim;
+    
     use proc_macro2::TokenStream;
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]

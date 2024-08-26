@@ -8,7 +8,6 @@ use crate::mac::Macro;
 use crate::path::{Path, QSelf};
 use crate::punctuated::Punctuated;
 use crate::token;
-use proc_macro2::TokenStream;
 
 ast_enum_of_structs! {
     /// The possible types that a Rust value could have.
@@ -315,7 +314,7 @@ pub(crate) mod parsing {
         TypeImplTrait, TypeInfer, TypeMacro, TypeNever, TypeParen, TypePath, TypePtr,
         TypeReference, TypeSlice, TypeTraitObject, TypeTuple,
     };
-    use crate::verbatim;
+    
     use proc_macro2::Span;
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
