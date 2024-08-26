@@ -170,6 +170,7 @@ ast_struct! {
     /// assert_eq!(doc, attr);
     /// ```
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+    #[derive(serde::Serialize)]
     pub struct Attribute {
         pub pound_token: Token![#],
         pub style: AttrStyle,
@@ -442,6 +443,7 @@ ast_enum! {
     /// - `//! # Example`
     /// - `/*! Please file an issue */`
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+        #[derive(serde::Serialize)]
     pub enum AttrStyle {
         Outer,
         Inner(Token![!]),
@@ -470,7 +472,12 @@ ast_enum! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+        #[derive(serde::Serialize)]
     pub enum Meta {
+
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         Path(Path),
 
         /// A structured list within an attribute, like `derive(Copy, Clone)`.
@@ -484,9 +491,16 @@ ast_enum! {
 ast_struct! {
     /// A structured list within an attribute, like `derive(Copy, Clone)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+    #[derive(serde::Serialize)]
     pub struct MetaList {
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
         pub path: Path,
         pub delimiter: MacroDelimiter,
+
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub tokens: TokenStream,
     }
 }
@@ -494,7 +508,11 @@ ast_struct! {
 ast_struct! {
     /// A name-value pair within an attribute, like `feature = "nightly"`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+        #[derive(serde::Serialize)]
     pub struct MetaNameValue {
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub path: Path,
         pub eq_token: Token![=],
         pub value: Expr,

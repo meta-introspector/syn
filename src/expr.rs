@@ -21,7 +21,8 @@ use crate::token;
 #[cfg(feature = "full")]
 use crate::ty::ReturnType;
 use crate::ty::Type;
-use proc_macro2::{Span, TokenStream};
+//use proc_macro2::{Span, TokenStream};
+use proc_macro2::{Span};
 #[cfg(feature = "printing")]
 use quote::IdentFragment;
 #[cfg(feature = "printing")]
@@ -107,6 +108,7 @@ ast_enum_of_structs! {
     /// `receiver.receiver` or `pat.pat` or `cond.cond`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+    #[derive(serde::Serialize)]
     pub enum Expr {
         /// A slice literal expression: `[a, b, c, d]`.
         Array(ExprArray),
@@ -157,6 +159,7 @@ ast_enum_of_structs! {
         /// This variant is important for faithfully representing the precedence
         /// of expressions and is related to `None`-delimited spans in a
         /// `TokenStream`.
+	
         Group(ExprGroup),
 
         /// An `if` expression with an optional `else` block: `if expr { ... }
@@ -233,7 +236,9 @@ ast_enum_of_structs! {
         Unsafe(ExprUnsafe),
 
         /// Tokens in expression position not interpreted by Syn.
-        Verbatim(TokenStream),
+	//#[serde(skip_serializing)]
+//	#[serde(skip_deserializing)]	
+        Verbatim(String),
 
         /// A while loop: `while expr { ... }`.
         While(ExprWhile),
@@ -264,6 +269,7 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A slice literal expression: `[a, b, c, d]`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ExprArray #full {
         pub attrs: Vec<Attribute>,
         pub bracket_token: token::Bracket,
@@ -274,6 +280,7 @@ ast_struct! {
 ast_struct! {
     /// An assignment expression: `a = compute()`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ExprAssign #full {
         pub attrs: Vec<Attribute>,
         pub left: Box<Expr>,
@@ -285,6 +292,7 @@ ast_struct! {
 ast_struct! {
     /// An async block: `async { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ExprAsync #full {
         pub attrs: Vec<Attribute>,
         pub async_token: Token![async],
@@ -296,6 +304,7 @@ ast_struct! {
 ast_struct! {
     /// An await expression: `fut.await`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprAwait #full {
         pub attrs: Vec<Attribute>,
         pub base: Box<Expr>,
@@ -307,6 +316,7 @@ ast_struct! {
 ast_struct! {
     /// A binary operation: `a + b`, `a += b`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprBinary {
         pub attrs: Vec<Attribute>,
         pub left: Box<Expr>,
@@ -318,6 +328,7 @@ ast_struct! {
 ast_struct! {
     /// A blocked scope: `{ ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprBlock #full {
         pub attrs: Vec<Attribute>,
         pub label: Option<Label>,
@@ -329,6 +340,7 @@ ast_struct! {
     /// A `break`, with an optional label to break and an optional
     /// expression.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprBreak #full {
         pub attrs: Vec<Attribute>,
         pub break_token: Token![break],
@@ -340,6 +352,7 @@ ast_struct! {
 ast_struct! {
     /// A function call expression: `invoke(a, b)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprCall {
         pub attrs: Vec<Attribute>,
         pub func: Box<Expr>,
@@ -351,6 +364,7 @@ ast_struct! {
 ast_struct! {
     /// A cast expression: `foo as f64`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprCast {
         pub attrs: Vec<Attribute>,
         pub expr: Box<Expr>,
@@ -362,6 +376,7 @@ ast_struct! {
 ast_struct! {
     /// A closure expression: `|a, b| a + b`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprClosure #full {
         pub attrs: Vec<Attribute>,
         pub lifetimes: Option<BoundLifetimes>,
@@ -380,6 +395,7 @@ ast_struct! {
 ast_struct! {
     /// A const block: `const { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprConst #full {
         pub attrs: Vec<Attribute>,
         pub const_token: Token![const],
@@ -390,6 +406,7 @@ ast_struct! {
 ast_struct! {
     /// A `continue`, with an optional label.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprContinue #full {
         pub attrs: Vec<Attribute>,
         pub continue_token: Token![continue],
@@ -401,6 +418,7 @@ ast_struct! {
     /// Access of a named struct field (`obj.k`) or unnamed tuple struct
     /// field (`obj.0`).
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprField {
         pub attrs: Vec<Attribute>,
         pub base: Box<Expr>,
@@ -412,6 +430,7 @@ ast_struct! {
 ast_struct! {
     /// A for loop: `for pat in expr { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprForLoop #full {
         pub attrs: Vec<Attribute>,
         pub label: Option<Label>,
@@ -430,6 +449,7 @@ ast_struct! {
     /// of expressions and is related to `None`-delimited spans in a
     /// `TokenStream`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprGroup {
         pub attrs: Vec<Attribute>,
         pub group_token: token::Group,
@@ -444,6 +464,7 @@ ast_struct! {
     /// The `else` branch expression may only be an `If` or `Block`
     /// expression, not any of the other types of expression.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprIf #full {
         pub attrs: Vec<Attribute>,
         pub if_token: Token![if],
@@ -456,6 +477,7 @@ ast_struct! {
 ast_struct! {
     /// A square bracketed indexing expression: `vector[2]`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprIndex {
         pub attrs: Vec<Attribute>,
         pub expr: Box<Expr>,
@@ -467,6 +489,7 @@ ast_struct! {
 ast_struct! {
     /// The inferred value of a const generic argument, denoted `_`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprInfer #full {
         pub attrs: Vec<Attribute>,
         pub underscore_token: Token![_],
@@ -476,6 +499,7 @@ ast_struct! {
 ast_struct! {
     /// A `let` guard: `let Some(x) = opt`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprLet #full {
         pub attrs: Vec<Attribute>,
         pub let_token: Token![let],
@@ -488,6 +512,7 @@ ast_struct! {
 ast_struct! {
     /// A literal in place of an expression: `1`, `"foo"`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprLit {
         pub attrs: Vec<Attribute>,
         pub lit: Lit,
@@ -497,6 +522,7 @@ ast_struct! {
 ast_struct! {
     /// Conditionless loop: `loop { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprLoop #full {
         pub attrs: Vec<Attribute>,
         pub label: Option<Label>,
@@ -508,6 +534,7 @@ ast_struct! {
 ast_struct! {
     /// A macro invocation expression: `format!("{}", q)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprMacro {
         pub attrs: Vec<Attribute>,
         pub mac: Macro,
@@ -517,6 +544,7 @@ ast_struct! {
 ast_struct! {
     /// A `match` expression: `match n { Some(n) => {}, None => {} }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+     #[derive(serde::Serialize)]
     pub struct ExprMatch #full {
         pub attrs: Vec<Attribute>,
         pub match_token: Token![match],
@@ -529,10 +557,15 @@ ast_struct! {
 ast_struct! {
     /// A method call expression: `x.foo::<T>(a, b)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprMethodCall {
         pub attrs: Vec<Attribute>,
         pub receiver: Box<Expr>,
         pub dot_token: Token![.],
+
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub method: Ident,
         pub turbofish: Option<AngleBracketedGenericArguments>,
         pub paren_token: token::Paren,
@@ -543,6 +576,7 @@ ast_struct! {
 ast_struct! {
     /// A parenthesized expression: `(a + b)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprParen {
         pub attrs: Vec<Attribute>,
         pub paren_token: token::Paren,
@@ -556,6 +590,7 @@ ast_struct! {
     ///
     /// A plain identifier like `x` is a path of length 1.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+     #[derive(serde::Serialize)]
     pub struct ExprPath {
         pub attrs: Vec<Attribute>,
         pub qself: Option<QSelf>,
@@ -566,6 +601,7 @@ ast_struct! {
 ast_struct! {
     /// A range expression: `1..2`, `1..`, `..2`, `1..=2`, `..=2`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ExprRange #full {
         pub attrs: Vec<Attribute>,
         pub start: Option<Box<Expr>>,
@@ -577,6 +613,7 @@ ast_struct! {
 ast_struct! {
     /// A referencing operation: `&a` or `&mut a`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+    #[derive(serde::Serialize)]
     pub struct ExprReference {
         pub attrs: Vec<Attribute>,
         pub and_token: Token![&],
@@ -588,6 +625,7 @@ ast_struct! {
 ast_struct! {
     /// An array literal constructed from one repeated element: `[0u8; N]`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ExprRepeat #full {
         pub attrs: Vec<Attribute>,
         pub bracket_token: token::Bracket,
@@ -600,6 +638,7 @@ ast_struct! {
 ast_struct! {
     /// A `return`, with an optional value to be returned.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ExprReturn #full {
         pub attrs: Vec<Attribute>,
         pub return_token: Token![return],
@@ -613,6 +652,7 @@ ast_struct! {
     /// The `rest` provides the value of the remaining fields as in `S { a:
     /// 1, b: 1, ..rest }`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct ExprStruct {
         pub attrs: Vec<Attribute>,
         pub qself: Option<QSelf>,
@@ -627,6 +667,7 @@ ast_struct! {
 ast_struct! {
     /// A try-expression: `expr?`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ExprTry #full {
         pub attrs: Vec<Attribute>,
         pub expr: Box<Expr>,
@@ -637,6 +678,7 @@ ast_struct! {
 ast_struct! {
     /// A try block: `try { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ExprTryBlock #full {
         pub attrs: Vec<Attribute>,
         pub try_token: Token![try],
@@ -647,6 +689,7 @@ ast_struct! {
 ast_struct! {
     /// A tuple expression: `(a, b, c, d)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ExprTuple #full {
         pub attrs: Vec<Attribute>,
         pub paren_token: token::Paren,
@@ -657,6 +700,7 @@ ast_struct! {
 ast_struct! {
     /// A unary operation: `!x`, `*x`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct ExprUnary {
         pub attrs: Vec<Attribute>,
         pub op: UnOp,
@@ -667,6 +711,7 @@ ast_struct! {
 ast_struct! {
     /// An unsafe block: `unsafe { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ExprUnsafe #full {
         pub attrs: Vec<Attribute>,
         pub unsafe_token: Token![unsafe],
@@ -677,6 +722,7 @@ ast_struct! {
 ast_struct! {
     /// A while loop: `while expr { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ExprWhile #full {
         pub attrs: Vec<Attribute>,
         pub label: Option<Label>,
@@ -689,6 +735,7 @@ ast_struct! {
 ast_struct! {
     /// A yield expression: `yield expr`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ExprYield #full {
         pub attrs: Vec<Attribute>,
         pub yield_token: Token![yield],
@@ -924,8 +971,13 @@ ast_enum! {
     /// A struct or tuple struct field accessed in a struct literal or field
     /// expression.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum Member {
         /// A named field like `self.x`.
+
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         Named(Ident),
         /// An unnamed field like `self.0`.
         Unnamed(Index),
@@ -991,8 +1043,13 @@ impl IdentFragment for Member {
 ast_struct! {
     /// The index of an unnamed tuple struct field.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Index {
         pub index: u32,
+
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub span: Span,
     }
 }
@@ -1035,6 +1092,7 @@ impl IdentFragment for Index {
 ast_struct! {
     /// A field-value pair in a struct literal.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct FieldValue {
         pub attrs: Vec<Attribute>,
         pub member: Member,
@@ -1051,6 +1109,7 @@ ast_struct! {
 ast_struct! {
     /// A lifetime labeling a `for`, `while`, or `loop`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct Label {
         pub name: Lifetime,
         pub colon_token: Token![:],
@@ -1077,6 +1136,7 @@ ast_struct! {
     /// # }
     /// ```
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct Arm {
         pub attrs: Vec<Attribute>,
         pub pat: Pat,
@@ -1091,6 +1151,7 @@ ast_struct! {
 ast_enum! {
     /// Limit types of a range, inclusive or exclusive.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub enum RangeLimits {
         /// Inclusive at the beginning, exclusive at the end.
         HalfOpen(Token![..]),
@@ -1827,7 +1888,7 @@ pub(crate) mod parsing {
                 if content.parse::<Expr>().is_ok() && content.is_empty() {
                     let expr_block = verbatim::between(input, &scan);
                     input.advance_to(&scan);
-                    return Ok(Expr::Verbatim(expr_block));
+                    return Ok(Expr::Verbatim("expr_block".to_string()));
                 }
             }
             Err(input.error("unsupported expression; enable syn's features=[\"full\"]"))

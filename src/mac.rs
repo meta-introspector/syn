@@ -14,10 +14,14 @@ use proc_macro2::TokenTree;
 ast_struct! {
     /// A macro invocation: `println!("{}", mac)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+    #[derive(serde::Serialize)]
     pub struct Macro {
         pub path: Path,
         pub bang_token: Token![!],
         pub delimiter: MacroDelimiter,
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub tokens: TokenStream,
     }
 }
@@ -25,6 +29,7 @@ ast_struct! {
 ast_enum! {
     /// A grouping token that surrounds a macro body: `m!(...)` or `m!{...}` or `m![...]`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+    #[derive(serde::Serialize)]
     pub enum MacroDelimiter {
         Paren(Paren),
         Brace(Brace),

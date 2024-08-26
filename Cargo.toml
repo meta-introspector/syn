@@ -38,6 +38,8 @@ test = ["syn-test-suite/all-features"]
 proc-macro2 = { version = "1.0.83", default-features = false }
 quote = { version = "1.0.35", optional = true, default-features = false }
 unicode-ident = "1"
+serde = { version = "1.0", features = ["derive", "alloc", "rc", "std"] }
+serde_json = "1.0"
 
 [dev-dependencies]
 anyhow = "1"

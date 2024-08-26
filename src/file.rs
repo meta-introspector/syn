@@ -81,6 +81,7 @@ ast_struct! {
     /// ...
     /// ```
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct File {
         pub shebang: Option<String>,
         pub attrs: Vec<Attribute>,

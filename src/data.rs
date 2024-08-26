@@ -277,7 +277,7 @@ pub(crate) mod parsing {
                     if discriminant.is_ok() {
                         input.advance_to(&ahead);
                     } else if scan_lenient_discriminant(input).is_ok() {
-                        discriminant = Ok(Expr::Verbatim(verbatim::between(&begin, input)));
+                        discriminant = Ok(Expr::Verbatim("verbatim::between(&begin, input)".to_string()));
                     }
                     discriminant?
                 };
@@ -418,7 +418,7 @@ pub(crate) mod parsing {
                 let begin = input.fork();
                 input.call(Ident::parse_any)?;
                 input.parse::<FieldsNamed>()?;
-                Type::Verbatim(verbatim::between(&begin, input))
+                Type::Verbatim("verbatim::between(&begin, input)".to_string())
             } else {
                 input.parse()?
             };

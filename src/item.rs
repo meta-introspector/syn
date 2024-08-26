@@ -101,6 +101,7 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A constant item: `const MAX: u16 = 65535`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemConst {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -118,6 +119,7 @@ ast_struct! {
 ast_struct! {
     /// An enum definition: `enum Foo<A, B> { A(A), B(B) }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemEnum {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -132,6 +134,7 @@ ast_struct! {
 ast_struct! {
     /// An `extern crate` item: `extern crate serde`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemExternCrate {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -146,6 +149,7 @@ ast_struct! {
 ast_struct! {
     /// A free-standing function: `fn process(n: usize) -> Result<()> { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemFn {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -157,6 +161,7 @@ ast_struct! {
 ast_struct! {
     /// A block of foreign items: `extern "C" { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemForeignMod {
         pub attrs: Vec<Attribute>,
         pub unsafety: Option<Token![unsafe]>,
@@ -170,6 +175,7 @@ ast_struct! {
     /// An impl block providing trait or associated items: `impl<A> Trait
     /// for Data<A> { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemImpl {
         pub attrs: Vec<Attribute>,
         pub defaultness: Option<Token![default]>,
@@ -188,6 +194,7 @@ ast_struct! {
 ast_struct! {
     /// A macro invocation, which includes `macro_rules!` definitions.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemMacro {
         pub attrs: Vec<Attribute>,
         /// The `example` in `macro_rules! example { ... }`.
@@ -200,6 +207,7 @@ ast_struct! {
 ast_struct! {
     /// A module or module declaration: `mod m` or `mod m { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemMod {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -214,6 +222,7 @@ ast_struct! {
 ast_struct! {
     /// A static item: `static BIKE: Shed = Shed(42)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemStatic {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -231,6 +240,7 @@ ast_struct! {
 ast_struct! {
     /// A struct definition: `struct Foo<A> { x: A }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemStruct {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -245,6 +255,7 @@ ast_struct! {
 ast_struct! {
     /// A trait definition: `pub trait Iterator { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemTrait {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -264,6 +275,7 @@ ast_struct! {
 ast_struct! {
     /// A trait alias: `pub trait SharableIterator = Iterator + Sync`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemTraitAlias {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -279,6 +291,7 @@ ast_struct! {
 ast_struct! {
     /// A type alias: `type Result<T> = std::result::Result<T, MyError>`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemType {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -294,6 +307,7 @@ ast_struct! {
 ast_struct! {
     /// A union definition: `union Foo<A, B> { x: A, y: B }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemUnion {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -307,6 +321,7 @@ ast_struct! {
 ast_struct! {
     /// A use declaration: `use std::collections::HashMap`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemUse {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,

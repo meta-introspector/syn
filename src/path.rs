@@ -11,6 +11,7 @@ use crate::ty::{ReturnType, Type};
 ast_struct! {
     /// A path at which a named item is exported (e.g. `std::collections::HashMap`).
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Path {
         pub leading_colon: Option<Token![::]>,
         pub segments: Punctuated<PathSegment, Token![::]>,
@@ -107,7 +108,11 @@ impl Path {
 ast_struct! {
     /// A segment of a path together with any path arguments on that segment.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct PathSegment {
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub arguments: PathArguments,
     }
@@ -136,6 +141,7 @@ ast_enum! {
     ///
     /// The `(A, B) -> C` in `Fn(A, B) -> C`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum PathArguments {
         None,
         /// The `<'a, T>` in `std::slice::iter<'a, T>`.
@@ -172,6 +178,7 @@ ast_enum! {
     /// An individual generic argument, like `'a`, `T`, or `Item = T`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum GenericArgument {
         /// A lifetime argument.
         Lifetime(Lifetime),
@@ -197,6 +204,7 @@ ast_struct! {
     /// Angle bracketed arguments of a path segment: the `<K, V>` in `HashMap<K,
     /// V>`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct AngleBracketedGenericArguments {
         pub colon2_token: Option<Token![::]>,
         pub lt_token: Token![<],
@@ -209,7 +217,11 @@ ast_struct! {
     /// A binding (equality constraint) on an associated type: the `Item = u8`
     /// in `Iterator<Item = u8>`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct AssocType {
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Option<AngleBracketedGenericArguments>,
         pub eq_token: Token![=],
@@ -221,7 +233,11 @@ ast_struct! {
     /// An equality constraint on an associated constant: the `PANIC = false` in
     /// `Trait<PANIC = false>`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct AssocConst {
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Option<AngleBracketedGenericArguments>,
         pub eq_token: Token![=],
@@ -232,7 +248,11 @@ ast_struct! {
 ast_struct! {
     /// An associated type bound: `Iterator<Item: Display>`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Constraint {
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Option<AngleBracketedGenericArguments>,
         pub colon_token: Token![:],
@@ -244,6 +264,7 @@ ast_struct! {
     /// Arguments of a function path segment: the `(A, B) -> C` in `Fn(A,B) ->
     /// C`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct ParenthesizedGenericArguments {
         pub paren_token: token::Paren,
         /// `(A, B)`
@@ -271,6 +292,7 @@ ast_struct! {
     ///  ty       position = 0
     /// ```
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct QSelf {
         pub lt_token: Token![<],
         pub ty: Box<Type>,
@@ -430,7 +452,7 @@ pub(crate) mod parsing {
                 braced!(content in input);
                 content.parse::<Expr>()?;
                 let verbatim = verbatim::between(&begin, input);
-                return Ok(Expr::Verbatim(verbatim));
+                return Ok(Expr::Verbatim("verbatim".to_string()));
             }
         }
 
