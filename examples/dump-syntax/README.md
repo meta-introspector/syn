@@ -5,7 +5,8 @@ Use the following command from this directory to test this program by running it
 on its own source code:
 
 ```
-cargo run -- src/main.rs
+cargo run -- ~/2024/08/20/self-similar/ocaml-rust-unification/src/ocaml_types.rs
+cargo run -- ~/2024/08/20/self-similar/ocaml-rust-unification/src/ocaml_types.rs | jq . >  ~/2024/08/20/self-similar/ocaml-rust-unification/src/ocaml_types.json
 ```
 
 The output will begin with:

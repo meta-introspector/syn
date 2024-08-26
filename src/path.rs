@@ -110,9 +110,6 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
          #[derive(serde::Serialize)]
     pub struct PathSegment {
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
         pub ident: Ident,
         pub arguments: PathArguments,
     }
