@@ -29,6 +29,7 @@ ast_enum! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+    #[derive(serde::Serialize)]
     pub enum Data {
         Struct(DataStruct),
         Enum(DataEnum),
@@ -39,6 +40,8 @@ ast_enum! {
 ast_struct! {
     /// A struct input to a `proc_macro_derive` macro.
     #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+    
+         #[derive(serde::Serialize)]
     pub struct DataStruct {
         pub struct_token: Token![struct],
         pub fields: Fields,
@@ -49,6 +52,7 @@ ast_struct! {
 ast_struct! {
     /// An enum input to a `proc_macro_derive` macro.
     #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+         #[derive(serde::Serialize)]
     pub struct DataEnum {
         pub enum_token: Token![enum],
         pub brace_token: token::Brace,
@@ -59,6 +63,7 @@ ast_struct! {
 ast_struct! {
     /// An untagged union input to a `proc_macro_derive` macro.
     #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+         #[derive(serde::Serialize)]
     pub struct DataUnion {
         pub union_token: Token![union],
         pub fields: FieldsNamed,
