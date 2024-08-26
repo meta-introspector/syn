@@ -9,8 +9,12 @@ use crate::ty::Type;
 ast_struct! {
     /// An enum variant.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Variant {
         pub attrs: Vec<Attribute>,
+
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
 
         /// Name of the variant.
         pub ident: Ident,
@@ -32,6 +36,7 @@ ast_enum_of_structs! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum Fields {
         /// Named fields of a struct or struct variant such as `Point { x: f64,
         /// y: f64 }`.
@@ -49,6 +54,7 @@ ast_struct! {
     /// Named fields of a struct or struct variant such as `Point { x: f64,
     /// y: f64 }`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct FieldsNamed {
         pub brace_token: token::Brace,
         pub named: Punctuated<Field, Token![,]>,
@@ -58,6 +64,7 @@ ast_struct! {
 ast_struct! {
     /// Unnamed fields of a tuple struct or tuple variant such as `Some(T)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct FieldsUnnamed {
         pub paren_token: token::Paren,
         pub unnamed: Punctuated<Field, Token![,]>,
@@ -181,6 +188,7 @@ impl<'a> IntoIterator for &'a mut Fields {
 ast_struct! {
     /// A field of a struct or enum variant.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Field {
         pub attrs: Vec<Attribute>,
 
@@ -191,6 +199,9 @@ ast_struct! {
         /// Name of the field, if any.
         ///
         /// Fields of tuple structs have no names.
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Option<Ident>,
 
         pub colon_token: Option<Token![:]>,
@@ -199,7 +210,11 @@ ast_struct! {
     }
 }
 
+#[derive(serde::Serialize)]
 pub struct Members<'a> {
+    #[serde(skip_serializing)]
+    #[serde(skip_deserializing)]
+
     fields: punctuated::Iter<'a, Field>,
     index: u32,
 }

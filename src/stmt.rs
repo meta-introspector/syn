@@ -8,6 +8,7 @@ use crate::token;
 ast_struct! {
     /// A braced block containing Rust statements.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct Block {
         pub brace_token: token::Brace,
         /// Statements in a block
@@ -18,6 +19,7 @@ ast_struct! {
 ast_enum! {
     /// A statement, usually ending in a semicolon.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub enum Stmt {
         /// A local (let) binding.
         Local(Local),
@@ -40,6 +42,7 @@ ast_enum! {
 ast_struct! {
     /// A local `let` binding: `let x: u64 = s.parse()?`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct Local {
         pub attrs: Vec<Attribute>,
         pub let_token: Token![let],
@@ -56,6 +59,7 @@ ast_struct! {
     /// `LocalInit` represents `= s.parse()?` in `let x: u64 = s.parse()?` and
     /// `= r else { return }` in `let Ok(x) = r else { return }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct LocalInit {
         pub eq_token: Token![=],
         pub expr: Box<Expr>,
@@ -70,6 +74,7 @@ ast_struct! {
     /// would expand to. It can be any of local variable (`let`), item, or
     /// expression.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct StmtMacro {
         pub attrs: Vec<Attribute>,
         pub mac: Macro,

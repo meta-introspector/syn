@@ -16,7 +16,7 @@ use crate::ty::{Abi, ReturnType, Type};
 use proc_macro2::TokenStream;
 #[cfg(feature = "parsing")]
 use std::mem;
-
+use serde::Serialize;
 ast_enum_of_structs! {
     /// Things that can appear directly inside of a module or scope.
     ///
@@ -27,6 +27,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum Item {
         /// A constant item: `const MAX: u16 = 65535`.
         Const(ItemConst),
@@ -76,7 +77,7 @@ ast_enum_of_structs! {
         Use(ItemUse),
 
         /// Tokens forming an item not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         // For testing exhaustiveness in downstream code, use the following idiom:
         //
@@ -106,6 +107,9 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub const_token: Token![const],
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+	
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Token![:],
@@ -124,6 +128,9 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub enum_token: Token![enum],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Generics,
         pub brace_token: token::Brace,
@@ -140,6 +147,9 @@ ast_struct! {
         pub vis: Visibility,
         pub extern_token: Token![extern],
         pub crate_token: Token![crate],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub rename: Option<(Token![as], Ident)>,
         pub semi_token: Token![;],
@@ -213,6 +223,9 @@ ast_struct! {
         pub vis: Visibility,
         pub unsafety: Option<Token![unsafe]>,
         pub mod_token: Token![mod],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub content: Option<(token::Brace, Vec<Item>)>,
         pub semi: Option<Token![;]>,
@@ -228,6 +241,9 @@ ast_struct! {
         pub vis: Visibility,
         pub static_token: Token![static],
         pub mutability: StaticMutability,
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Box<Type>,
@@ -245,6 +261,9 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub struct_token: Token![struct],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Generics,
         pub fields: Fields,
@@ -263,6 +282,9 @@ ast_struct! {
         pub auto_token: Option<Token![auto]>,
         pub restriction: Option<ImplRestriction>,
         pub trait_token: Token![trait],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Option<Token![:]>,
@@ -280,6 +302,9 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub trait_token: Token![trait],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -296,6 +321,9 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub type_token: Token![type],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -312,6 +340,9 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub union_token: Token![union],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub generics: Generics,
         pub fields: FieldsNamed,
@@ -363,6 +394,7 @@ impl From<DeriveInput> for Item {
                 attrs: input.attrs,
                 vis: input.vis,
                 struct_token: data.struct_token,
+		
                 ident: input.ident,
                 generics: input.generics,
                 fields: data.fields,
@@ -445,6 +477,7 @@ ast_enum_of_structs! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub enum UseTree {
         /// A path prefix of imports in a `use` item: `std::...`.
         Path(UsePath),
@@ -467,6 +500,9 @@ ast_struct! {
     /// A path prefix of imports in a `use` item: `std::...`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     pub struct UsePath {
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub colon2_token: Token![::],
         pub tree: Box<UseTree>,
@@ -477,6 +513,9 @@ ast_struct! {
     /// An identifier imported by a `use` item: `HashMap`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     pub struct UseName {
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
     }
 }
@@ -485,8 +524,14 @@ ast_struct! {
     /// An renamed identifier imported by a `use` item: `HashMap as Map`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     pub struct UseRename {
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub as_token: Token![as],
+		#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub rename: Ident,
     }
 }
@@ -518,6 +563,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum ForeignItem {
         /// A foreign function in an `extern` block.
         Fn(ForeignItemFn),
@@ -573,6 +619,9 @@ ast_struct! {
         pub vis: Visibility,
         pub static_token: Token![static],
         pub mutability: StaticMutability,
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
+
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Box<Type>,
@@ -613,6 +662,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum TraitItem {
         /// An associated constant within the definition of a trait.
         Const(TraitItemConst),
@@ -710,6 +760,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum ImplItem {
         /// An associated constant within an impl block.
         Const(ImplItemConst),
@@ -835,6 +886,7 @@ impl Signature {
 ast_enum_of_structs! {
     /// An argument in a function signature: the `n: usize` in `fn f(n: usize)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub enum FnArg {
         /// The `self` argument of an associated method.
         Receiver(Receiver),
@@ -894,6 +946,7 @@ ast_enum! {
     /// The mutability of an `Item::Static` or `ForeignItem::Static`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum StaticMutability {
         Mut(Token![mut]),
         None,
@@ -904,6 +957,7 @@ ast_enum! {
     /// Unused, but reserved for RFC 3323 restrictions.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum ImplRestriction {}
 
 

@@ -1533,7 +1533,7 @@ pub(crate) mod parsing {
             }
             let expr = Box::new(unary_expr(input, allow_struct)?);
             if raw.is_some() {
-                Ok(Expr::Verbatim(verbatim::between(&begin, input)))
+                Ok(Expr::Verbatim("verbatim::between(&begin, input)".to_string()))
             } else {
                 Ok(Expr::Reference(ExprReference {
                     attrs,
@@ -1585,9 +1585,10 @@ pub(crate) mod parsing {
         let atom = atom_expr(input, allow_struct)?;
         let mut e = trailer_helper(input, atom)?;
 
-        if let Expr::Verbatim(tokens) = &mut e {
-            *tokens = verbatim::between(&begin, input);
-        } else {
+        //if let Expr::Verbatim(tokens) = &mut e {
+            //*tokens = "verbatim::between(&begin, input)".to_string();
+        //} else
+	{
             let inner_attrs = e.replace_attrs(Vec::new());
             attrs.extend(inner_attrs);
             e.replace_attrs(attrs);
@@ -1907,7 +1908,7 @@ pub(crate) mod parsing {
         parenthesized!(args in input);
         args.parse::<TokenStream>()?;
 
-        Ok(Expr::Verbatim(verbatim::between(&begin, input)))
+        Ok(Expr::Verbatim("verbatim::between(&begin, input)".to_string()))
     }
 
     fn path_or_macro_or_struct(
@@ -2462,7 +2463,7 @@ pub(crate) mod parsing {
         let begin = input.fork();
         input.parse::<Token![become]>()?;
         input.parse::<Expr>()?;
-        Ok(Expr::Verbatim(verbatim::between(&begin, input)))
+        Ok(Expr::Verbatim("verbatim::between(&begin, input)".to_string()))
     }
 
     #[cfg(feature = "full")]
