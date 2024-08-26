@@ -157,7 +157,7 @@ pub(crate) mod parsing {
             let mut stmts = Vec::new();
             loop {
                 while let semi @ Some(_) = input.parse()? {
-                    stmts.push(Stmt::Expr(Expr::Verbatim(TokenStream::new()), semi));
+                    stmts.push(Stmt::Expr(Expr::Verbatim("TokenStream::new()".to_string()), semi));
                 }
                 if input.is_empty() {
                     break;

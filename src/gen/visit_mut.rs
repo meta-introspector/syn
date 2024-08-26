@@ -2715,9 +2715,9 @@ where
         crate::Lit::Bool(_binding_0) => {
             v.visit_lit_bool_mut(_binding_0);
         }
-        crate::Lit::Verbatim(_binding_0) => {
-            skip!(_binding_0);
-        }
+//        crate::Lit::Verbatim(_binding_0) => {
+//            skip!(_binding_0);
+//        }
     }
 }
 pub fn visit_lit_bool_mut<V>(v: &mut V, node: &mut crate::LitBool)

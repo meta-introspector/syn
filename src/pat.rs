@@ -23,7 +23,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
-         #[derive(serde::Serialize)]
+    #[derive(serde::Serialize)]
     pub enum Pat {
         /// A const block: `const { ... }`.
         Const(PatConst),
@@ -77,7 +77,7 @@ ast_enum_of_structs! {
         Type(PatType),
 
         /// Tokens in pattern position not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         /// A pattern that matches any value: `_`.
         Wild(PatWild),
@@ -113,6 +113,8 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub by_ref: Option<Token![ref]>,
         pub mutability: Option<Token![mut]>,
+	#[serde(skip_serializing)]
+	#[serde(skip_deserializing)]
         pub ident: Ident,
         pub subpat: Option<(Token![@], Box<Pat>)>,
     }
@@ -335,9 +337,10 @@ pub(crate) mod parsing {
                 input.call(pat_slice).map(Pat::Slice)
             } else if lookahead.peek(Token![..]) && !input.peek(Token![...]) {
                 pat_range_half_open(input)
-            } else if lookahead.peek(Token![const]) {
-                input.call(pat_const).map(Pat::Verbatim)
-            } else {
+            } //else if lookahead.peek(Token![const]) {
+                //input.call(pat_const).map(Pat::Verbatim)
+            //}
+	    else {
                 Err(lookahead.error())
             }
         }
@@ -476,7 +479,7 @@ pub(crate) mod parsing {
     fn pat_box(begin: ParseBuffer, input: ParseStream) -> Result<Pat> {
         input.parse::<Token![box]>()?;
         Pat::parse_single(input)?;
-        Ok(Pat::Verbatim(verbatim::between(&begin, input)))
+        Ok(Pat::Verbatim("verbatim::between(&begin, input)".to_string()))
     }
 
     fn pat_ident(input: ParseStream) -> Result<PatIdent> {
@@ -595,7 +598,7 @@ pub(crate) mod parsing {
         };
 
         let pat = if boxed.is_some() {
-            Pat::Verbatim(verbatim::between(&begin, input))
+            Pat::Verbatim("verbatim::between(&begin, input)".to_string())
         } else {
             Pat::Ident(PatIdent {
                 attrs: Vec::new(),

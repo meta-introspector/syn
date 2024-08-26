@@ -1964,14 +1964,19 @@ impl Debug for crate::Lit {
             crate::Lit::Int(v0) => v0.debug(formatter, "Int"),
             crate::Lit::Float(v0) => v0.debug(formatter, "Float"),
             crate::Lit::Bool(v0) => v0.debug(formatter, "Bool"),
-            crate::Lit::Verbatim(v0) => {
-                let mut formatter = formatter.debug_tuple("Verbatim");
-                formatter.field(v0);
-                formatter.finish()
-            }
+
         }
     }
 }
+	    //_(v0) => v0.debug(formatter, "Bool"),
+	    //crate::Lit::Verbatim(v0) => v0.debug(formatter, "Verbatim"),
+	    //_ => => v0.debug(formatter, "Other"),
+	    //            crate::Lit::Verbatim(v0) => {
+	    ///                let mut formatter = formatter.debug_tuple("Verbatim");
+	    //                formatter.field(v0);
+	    //                formatter.finish()
+	    //            }
+
 #[cfg(feature = "full")]
 #[cfg_attr(docsrs, doc(cfg(feature = "extra-traits")))]
 impl Debug for crate::Local {

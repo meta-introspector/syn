@@ -21,7 +21,7 @@ repository = "https://github.com/dtolnay/syn"
 rust-version = "1.61"
 
 [features]
-default = ["derive", "parsing", "printing", "clone-impls", "proc-macro"]
+default = ["derive", "parsing", "printing", "clone-impls", "proc-macro", "full","visit","visit-mut","fold","clone-impls","extra-traits",]
 derive = []
 full = []
 parsing = []
