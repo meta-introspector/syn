@@ -7,6 +7,8 @@ use crate::lifetime::Lifetime;
 use crate::punctuated::Punctuated;
 use crate::token;
 use crate::ty::{ReturnType, Type};
+use serde::{Serialize, Serializer};
+//use crate::serialize::serialize_ident;
 
 ast_struct! {
     /// A path at which a named item is exported (e.g. `std::collections::HashMap`).
@@ -110,6 +112,8 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
          #[derive(serde::Serialize)]
     pub struct PathSegment {
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub arguments: PathArguments,
     }

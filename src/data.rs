@@ -13,9 +13,8 @@ ast_struct! {
     pub struct Variant {
         pub attrs: Vec<Attribute>,
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         /// Name of the variant.
         pub ident: Ident,
 
@@ -265,7 +264,7 @@ pub(crate) mod parsing {
     use crate::restriction::{FieldMutability, Visibility};
     use crate::token;
     use crate::ty::Type;
-    use crate::verbatim;
+//    use crate::verbatim;
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
     impl Parse for Variant {

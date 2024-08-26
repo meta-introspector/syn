@@ -563,9 +563,7 @@ ast_struct! {
         pub receiver: Box<Expr>,
         pub dot_token: Token![.],
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub method: Ident,
         pub turbofish: Option<AngleBracketedGenericArguments>,
         pub paren_token: token::Paren,
@@ -1205,7 +1203,7 @@ pub(crate) mod parsing {
     use crate::ty;
     #[cfg(feature = "full")]
     use crate::ty::{ReturnType, Type};
-    use crate::verbatim;
+//    use crate::verbatim;
     #[cfg(feature = "full")]
     use proc_macro2::TokenStream;
     use std::mem;

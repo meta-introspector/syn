@@ -9,9 +9,11 @@ use crate::token;
 ast_struct! {
     /// Data structure sent to a `proc_macro_derive` macro.
     #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+    #[derive(serde::Serialize)]
     pub struct DeriveInput {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub data: Data,

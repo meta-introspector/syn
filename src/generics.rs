@@ -73,9 +73,7 @@ ast_struct! {
          #[derive(serde::Serialize)]
     pub struct TypeParam {
         pub attrs: Vec<Attribute>,
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Option<Token![:]>,
         pub bounds: Punctuated<TypeParamBound, Token![+]>,
@@ -91,9 +89,7 @@ ast_struct! {
     pub struct ConstParam {
         pub attrs: Vec<Attribute>,
         pub const_token: Token![const],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Type,
