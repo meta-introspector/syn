@@ -57,7 +57,10 @@ fn main() {
         process::exit(1);
     }
 }
-
+//use serde::{Deserialize, Serialize};
+//use serde_json::Result;
+//use serde_json;
+//use serde_json::{Result, Value};
 fn try_main() -> Result<(), Error> {
     let mut args = env::args_os();
     let _ = args.next(); // executable name
@@ -75,7 +78,9 @@ fn try_main() -> Result<(), Error> {
             source_code: code,
         }
     })?;
-    println!("{:#?}", syntax);
+    
+    let j = serde_json::to_string(&syntax).unwrap();
+    println!("{}", j);
 
     Ok(())
 }

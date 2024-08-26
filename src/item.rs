@@ -13,10 +13,9 @@ use crate::restriction::Visibility;
 use crate::stmt::Block;
 use crate::token;
 use crate::ty::{Abi, ReturnType, Type};
-use proc_macro2::TokenStream;
 #[cfg(feature = "parsing")]
 use std::mem;
-
+use serde::Serialize;
 ast_enum_of_structs! {
     /// Things that can appear directly inside of a module or scope.
     ///
@@ -27,6 +26,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+    #[derive(serde::Serialize)]
     pub enum Item {
         /// A constant item: `const MAX: u16 = 65535`.
         Const(ItemConst),
@@ -76,7 +76,7 @@ ast_enum_of_structs! {
         Use(ItemUse),
 
         /// Tokens forming an item not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         // For testing exhaustiveness in downstream code, use the following idiom:
         //
@@ -101,10 +101,12 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A constant item: `const MAX: u16 = 65535`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemConst {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub const_token: Token![const],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Token![:],
@@ -118,10 +120,12 @@ ast_struct! {
 ast_struct! {
     /// An enum definition: `enum Foo<A, B> { A(A), B(B) }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemEnum {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub enum_token: Token![enum],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub brace_token: token::Brace,
@@ -132,12 +136,16 @@ ast_struct! {
 ast_struct! {
     /// An `extern crate` item: `extern crate serde`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemExternCrate {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub extern_token: Token![extern],
         pub crate_token: Token![crate],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
+	
+	#[serde(serialize_with = "crate::serialize::serialize_option_token_ident")]
         pub rename: Option<(Token![as], Ident)>,
         pub semi_token: Token![;],
     }
@@ -146,6 +154,7 @@ ast_struct! {
 ast_struct! {
     /// A free-standing function: `fn process(n: usize) -> Result<()> { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemFn {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -157,6 +166,7 @@ ast_struct! {
 ast_struct! {
     /// A block of foreign items: `extern "C" { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemForeignMod {
         pub attrs: Vec<Attribute>,
         pub unsafety: Option<Token![unsafe]>,
@@ -170,6 +180,7 @@ ast_struct! {
     /// An impl block providing trait or associated items: `impl<A> Trait
     /// for Data<A> { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemImpl {
         pub attrs: Vec<Attribute>,
         pub defaultness: Option<Token![default]>,
@@ -188,9 +199,12 @@ ast_struct! {
 ast_struct! {
     /// A macro invocation, which includes `macro_rules!` definitions.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemMacro {
         pub attrs: Vec<Attribute>,
         /// The `example` in `macro_rules! example { ... }`.
+
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident")]
         pub ident: Option<Ident>,
         pub mac: Macro,
         pub semi_token: Option<Token![;]>,
@@ -200,11 +214,14 @@ ast_struct! {
 ast_struct! {
     /// A module or module declaration: `mod m` or `mod m { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemMod {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub unsafety: Option<Token![unsafe]>,
         pub mod_token: Token![mod],
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub content: Option<(token::Brace, Vec<Item>)>,
         pub semi: Option<Token![;]>,
@@ -214,11 +231,14 @@ ast_struct! {
 ast_struct! {
     /// A static item: `static BIKE: Shed = Shed(42)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemStatic {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub static_token: Token![static],
         pub mutability: StaticMutability,
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Box<Type>,
@@ -231,10 +251,13 @@ ast_struct! {
 ast_struct! {
     /// A struct definition: `struct Foo<A> { x: A }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemStruct {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub struct_token: Token![struct],
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub fields: Fields,
@@ -245,6 +268,7 @@ ast_struct! {
 ast_struct! {
     /// A trait definition: `pub trait Iterator { ... }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemTrait {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -252,6 +276,8 @@ ast_struct! {
         pub auto_token: Option<Token![auto]>,
         pub restriction: Option<ImplRestriction>,
         pub trait_token: Token![trait],
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Option<Token![:]>,
@@ -264,10 +290,13 @@ ast_struct! {
 ast_struct! {
     /// A trait alias: `pub trait SharableIterator = Iterator + Sync`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemTraitAlias {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub trait_token: Token![trait],
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -279,10 +308,13 @@ ast_struct! {
 ast_struct! {
     /// A type alias: `type Result<T> = std::result::Result<T, MyError>`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemType {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub type_token: Token![type],
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -294,10 +326,13 @@ ast_struct! {
 ast_struct! {
     /// A union definition: `union Foo<A, B> { x: A, y: B }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemUnion {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub union_token: Token![union],
+	    
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub fields: FieldsNamed,
@@ -307,6 +342,7 @@ ast_struct! {
 ast_struct! {
     /// A use declaration: `use std::collections::HashMap`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ItemUse {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -430,6 +466,7 @@ ast_enum_of_structs! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub enum UseTree {
         /// A path prefix of imports in a `use` item: `std::...`.
         Path(UsePath),
@@ -451,7 +488,9 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A path prefix of imports in a `use` item: `std::...`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct UsePath {
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon2_token: Token![::],
         pub tree: Box<UseTree>,
@@ -461,7 +500,9 @@ ast_struct! {
 ast_struct! {
     /// An identifier imported by a `use` item: `HashMap`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct UseName {
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
     }
 }
@@ -469,9 +510,14 @@ ast_struct! {
 ast_struct! {
     /// An renamed identifier imported by a `use` item: `HashMap as Map`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct UseRename {
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub as_token: Token![as],
+
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub rename: Ident,
     }
 }
@@ -479,6 +525,7 @@ ast_struct! {
 ast_struct! {
     /// A glob import in a `use` item: `*`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct UseGlob {
         pub star_token: Token![*],
     }
@@ -487,6 +534,7 @@ ast_struct! {
 ast_struct! {
     /// A braced group of imports in a `use` item: `{A, B, C}`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct UseGroup {
         pub brace_token: token::Brace,
         pub items: Punctuated<UseTree, Token![,]>,
@@ -503,6 +551,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+    #[derive(serde::Serialize)]
     pub enum ForeignItem {
         /// A foreign function in an `extern` block.
         Fn(ForeignItemFn),
@@ -517,7 +566,7 @@ ast_enum_of_structs! {
         Macro(ForeignItemMacro),
 
         /// Tokens in an `extern` block not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         // For testing exhaustiveness in downstream code, use the following idiom:
         //
@@ -542,6 +591,7 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A foreign function in an `extern` block.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ForeignItemFn {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -553,11 +603,14 @@ ast_struct! {
 ast_struct! {
     /// A foreign static item in an `extern` block: `static ext: u8`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ForeignItemStatic {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub static_token: Token![static],
         pub mutability: StaticMutability,
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Box<Type>,
@@ -568,10 +621,13 @@ ast_struct! {
 ast_struct! {
     /// A foreign type in an `extern` block: `type void`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ForeignItemType {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub type_token: Token![type],
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub semi_token: Token![;],
@@ -581,6 +637,7 @@ ast_struct! {
 ast_struct! {
     /// A macro invocation within an extern block.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ForeignItemMacro {
         pub attrs: Vec<Attribute>,
         pub mac: Macro,
@@ -598,6 +655,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+    #[derive(serde::Serialize)]
     pub enum TraitItem {
         /// An associated constant within the definition of a trait.
         Const(TraitItemConst),
@@ -612,7 +670,7 @@ ast_enum_of_structs! {
         Macro(TraitItemMacro),
 
         /// Tokens within the definition of a trait not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         // For testing exhaustiveness in downstream code, use the following idiom:
         //
@@ -637,9 +695,11 @@ ast_enum_of_structs! {
 ast_struct! {
     /// An associated constant within the definition of a trait.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct TraitItemConst {
         pub attrs: Vec<Attribute>,
         pub const_token: Token![const],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Token![:],
@@ -652,6 +712,7 @@ ast_struct! {
 ast_struct! {
     /// An associated function within the definition of a trait.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct TraitItemFn {
         pub attrs: Vec<Attribute>,
         pub sig: Signature,
@@ -663,9 +724,11 @@ ast_struct! {
 ast_struct! {
     /// An associated type within the definition of a trait.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct TraitItemType {
         pub attrs: Vec<Attribute>,
         pub type_token: Token![type],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Option<Token![:]>,
@@ -678,6 +741,7 @@ ast_struct! {
 ast_struct! {
     /// A macro invocation within the definition of a trait.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct TraitItemMacro {
         pub attrs: Vec<Attribute>,
         pub mac: Macro,
@@ -695,6 +759,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum ImplItem {
         /// An associated constant within an impl block.
         Const(ImplItemConst),
@@ -709,7 +774,7 @@ ast_enum_of_structs! {
         Macro(ImplItemMacro),
 
         /// Tokens within an impl block not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         // For testing exhaustiveness in downstream code, use the following idiom:
         //
@@ -734,11 +799,13 @@ ast_enum_of_structs! {
 ast_struct! {
     /// An associated constant within an impl block.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ImplItemConst {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub defaultness: Option<Token![default]>,
         pub const_token: Token![const],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Token![:],
@@ -752,6 +819,7 @@ ast_struct! {
 ast_struct! {
     /// An associated function within an impl block.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ImplItemFn {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
@@ -764,11 +832,13 @@ ast_struct! {
 ast_struct! {
     /// An associated type within an impl block.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct ImplItemType {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub defaultness: Option<Token![default]>,
         pub type_token: Token![type],
+#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -780,6 +850,7 @@ ast_struct! {
 ast_struct! {
     /// A macro invocation within an impl block.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct ImplItemMacro {
         pub attrs: Vec<Attribute>,
         pub mac: Macro,
@@ -791,12 +862,14 @@ ast_struct! {
     /// A function signature in a trait or implementation: `unsafe fn
     /// initialize(&self)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+    #[derive(serde::Serialize)]
     pub struct Signature {
         pub constness: Option<Token![const]>,
         pub asyncness: Option<Token![async]>,
         pub unsafety: Option<Token![unsafe]>,
         pub abi: Option<Abi>,
         pub fn_token: Token![fn],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub paren_token: token::Paren,
@@ -820,6 +893,7 @@ impl Signature {
 ast_enum_of_structs! {
     /// An argument in a function signature: the `n: usize` in `fn f(n: usize)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub enum FnArg {
         /// The `self` argument of an associated method.
         Receiver(Receiver),
@@ -838,6 +912,7 @@ ast_struct! {
     /// shorthand case, the type in `ty` is reconstructed as one of `Self`,
     /// `&Self`, or `&mut Self`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct Receiver {
         pub attrs: Vec<Attribute>,
         pub reference: Option<(Token![&], Option<Lifetime>)>,
@@ -867,6 +942,7 @@ ast_struct! {
     /// }
     /// ```
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct Variadic {
         pub attrs: Vec<Attribute>,
         pub pat: Option<(Box<Pat>, Token![:])>,
@@ -879,6 +955,7 @@ ast_enum! {
     /// The mutability of an `Item::Static` or `ForeignItem::Static`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum StaticMutability {
         Mut(Token![mut]),
         None,
@@ -889,6 +966,7 @@ ast_enum! {
     /// Unused, but reserved for RFC 3323 restrictions.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum ImplRestriction {}
 
 
@@ -931,7 +1009,7 @@ pub(crate) mod parsing {
     use crate::stmt::Block;
     use crate::token;
     use crate::ty::{Abi, ReturnType, Type, TypePath, TypeReference};
-    use crate::verbatim;
+    
     use proc_macro2::TokenStream;
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
@@ -957,7 +1035,7 @@ pub(crate) mod parsing {
             let sig: Signature = input.parse()?;
             if input.peek(Token![;]) {
                 input.parse::<Token![;]>()?;
-                Ok(Item::Verbatim(verbatim::between(&begin, input)))
+                Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string()))
             } else {
                 parse_rest_of_fn(input, Vec::new(), vis, sig).map(Item::Fn)
             }
@@ -983,7 +1061,7 @@ pub(crate) mod parsing {
             let allow_crate_root_in_path = true;
             match parse_item_use(input, allow_crate_root_in_path)? {
                 Some(item_use) => Ok(Item::Use(item_use)),
-                None => Ok(Item::Verbatim(verbatim::between(&begin, input))),
+                None => Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string())),
             }
         } else if lookahead.peek(Token![static]) {
             let vis = input.parse()?;
@@ -994,13 +1072,13 @@ pub(crate) mod parsing {
                 input.parse::<Token![=]>()?;
                 input.parse::<Expr>()?;
                 input.parse::<Token![;]>()?;
-                Ok(Item::Verbatim(verbatim::between(&begin, input)))
+                Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string()))
             } else {
                 let colon_token = input.parse()?;
                 let ty = input.parse()?;
                 if input.peek(Token![;]) {
                     input.parse::<Token![;]>()?;
-                    Ok(Item::Verbatim(verbatim::between(&begin, input)))
+                    Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string()))
                 } else {
                     Ok(Item::Static(ItemStatic {
                         attrs: Vec::new(),
@@ -1053,7 +1131,7 @@ pub(crate) mod parsing {
                         semi_token,
                     }))
                 }
-                _ => Ok(Item::Verbatim(verbatim::between(&begin, input))),
+                _ => Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string())),
             }
         } else if lookahead.peek(Token![unsafe]) {
             ahead.parse::<Token![unsafe]>()?;
@@ -1067,7 +1145,7 @@ pub(crate) mod parsing {
                 if let Some(item) = parse_impl(input, allow_verbatim_impl)? {
                     Ok(Item::Impl(item))
                 } else {
-                    Ok(Item::Verbatim(verbatim::between(&begin, input)))
+                    Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string()))
                 }
             } else if lookahead.peek(Token![extern]) {
                 input.parse().map(Item::ForeignMod)
@@ -1097,7 +1175,7 @@ pub(crate) mod parsing {
             if let Some(item) = parse_impl(input, allow_verbatim_impl)? {
                 Ok(Item::Impl(item))
             } else {
-                Ok(Item::Verbatim(verbatim::between(&begin, input)))
+                Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string()))
             }
         } else if lookahead.peek(Token![macro]) {
             input.advance_to(&ahead);
@@ -1119,10 +1197,13 @@ pub(crate) mod parsing {
         Ok(item)
     }
 
+    #[derive(serde::Serialize)]
     struct FlexibleItemType {
         vis: Visibility,
         defaultness: Option<Token![default]>,
         type_token: Token![type],
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         ident: Ident,
         generics: Generics,
         colon_token: Option<Token![:]>,
@@ -1278,7 +1359,7 @@ pub(crate) mod parsing {
             return Err(lookahead.error());
         }
 
-        Ok(Item::Verbatim(verbatim::between(&begin, input)))
+        Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string()))
     }
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
@@ -1828,7 +1909,7 @@ pub(crate) mod parsing {
                     content.call(Attribute::parse_inner)?;
                     content.call(Block::parse_within)?;
 
-                    Ok(ForeignItem::Verbatim(verbatim::between(&begin, input)))
+                    Ok(ForeignItem::Verbatim("verbatim::between(&begin, input)".to_string()))
                 } else {
                     Ok(ForeignItem::Fn(ForeignItemFn {
                         attrs: Vec::new(),
@@ -1848,7 +1929,7 @@ pub(crate) mod parsing {
                     input.parse::<Token![=]>()?;
                     input.parse::<Expr>()?;
                     input.parse::<Token![;]>()?;
-                    Ok(ForeignItem::Verbatim(verbatim::between(&begin, input)))
+                    Ok(ForeignItem::Verbatim("verbatim::between(&begin, input)".to_string()))
                 } else {
                     Ok(ForeignItem::Static(ForeignItemStatic {
                         attrs: Vec::new(),
@@ -1957,7 +2038,7 @@ pub(crate) mod parsing {
         )?;
 
         if colon_token.is_some() || ty.is_some() {
-            Ok(ForeignItem::Verbatim(verbatim::between(&begin, input)))
+            Ok(ForeignItem::Verbatim("verbatim::between(&begin, input)".to_string()))
         } else {
             Ok(ForeignItem::Type(ForeignItemType {
                 attrs: Vec::new(),
@@ -2027,7 +2108,7 @@ pub(crate) mod parsing {
 
         let (eq_token, ty) = match ty {
             Some(ty) if colon_token.is_none() => ty,
-            _ => return Ok(Item::Verbatim(verbatim::between(&begin, input))),
+            _ => return Ok(Item::Verbatim("verbatim::between(&begin, input)".to_string())),
         };
 
         Ok(Item::Type(ItemType {
@@ -2313,7 +2394,7 @@ pub(crate) mod parsing {
                             semi_token,
                         }))
                     } else {
-                        return Ok(TraitItem::Verbatim(verbatim::between(&begin, input)));
+                        return Ok(TraitItem::Verbatim("verbatim::between(&begin, input)".to_string()));
                     }
                 } else if lookahead.peek(Token![async])
                     || lookahead.peek(Token![unsafe])
@@ -2341,7 +2422,7 @@ pub(crate) mod parsing {
 
             match (vis, defaultness) {
                 (Visibility::Inherited, None) => {}
-                _ => return Ok(TraitItem::Verbatim(verbatim::between(&begin, input))),
+                _ => return Ok(TraitItem::Verbatim("verbatim::between(&begin, input)".to_string())),
             }
 
             let item_attrs = match &mut item {
@@ -2465,7 +2546,7 @@ pub(crate) mod parsing {
         )?;
 
         if vis.is_some() {
-            Ok(TraitItem::Verbatim(verbatim::between(&begin, input)))
+            Ok(TraitItem::Verbatim("verbatim::between(&begin, input)".to_string()))
         } else {
             Ok(TraitItem::Type(TraitItemType {
                 attrs: Vec::new(),
@@ -2578,7 +2659,7 @@ pub(crate) mod parsing {
             self_ty = if polarity.is_none() {
                 first_ty
             } else {
-                Type::Verbatim(verbatim::between(&begin, input))
+                Type::Verbatim("verbatim::between(&begin, input)".to_string())
             };
         }
 
@@ -2632,7 +2713,7 @@ pub(crate) mod parsing {
                 if let Some(item) = parse_impl_item_fn(input, allow_omitted_body)? {
                     Ok(ImplItem::Fn(item))
                 } else {
-                    Ok(ImplItem::Verbatim(verbatim::between(&begin, input)))
+                    Ok(ImplItem::Verbatim("verbatim::between(&begin, input)".to_string()))
                 }
             } else if lookahead.peek(Token![const]) {
                 input.advance_to(&ahead);
@@ -2672,7 +2753,7 @@ pub(crate) mod parsing {
                             semi_token,
                         }))
                     }
-                    _ => Ok(ImplItem::Verbatim(verbatim::between(&begin, input))),
+                    _ => Ok(ImplItem::Verbatim("verbatim::between(&begin, input)".to_string())),
                 };
             } else if lookahead.peek(Token![type]) {
                 parse_impl_item_type(begin, input)
@@ -2829,7 +2910,7 @@ pub(crate) mod parsing {
 
         let (eq_token, ty) = match ty {
             Some(ty) if colon_token.is_none() => ty,
-            _ => return Ok(ImplItem::Verbatim(verbatim::between(&begin, input))),
+            _ => return Ok(ImplItem::Verbatim("verbatim::between(&begin, input)".to_string())),
         };
 
         Ok(ImplItem::Type(ImplItemType {

@@ -297,7 +297,7 @@ pub(crate) fn expr_trailing_brace(mut expr: &Expr) -> bool {
                 None => return false,
             },
             Expr::Unary(e) => expr = &e.expr,
-            Expr::Verbatim(e) => return tokens_trailing_brace(e),
+            Expr::Verbatim(e) => return false,//tokens_trailing_brace(e),
             Expr::Yield(e) => match &e.expr {
                 Some(e) => expr = e,
                 None => return false,
@@ -343,7 +343,7 @@ pub(crate) fn expr_trailing_brace(mut expr: &Expr) -> bool {
                     ControlFlow::Break(trailing_brace) => return trailing_brace,
                     ControlFlow::Continue(t) => ty = t,
                 },
-                Type::Verbatim(t) => return tokens_trailing_brace(t),
+                Type::Verbatim(t) => return false, //return tokens_trailing_brace(t),
 
                 Type::Array(_)
                 | Type::Group(_)
@@ -375,7 +375,7 @@ pub(crate) fn expr_trailing_brace(mut expr: &Expr) -> bool {
                 None => ControlFlow::Break(false),
             },
             TypeParamBound::Lifetime(_) => ControlFlow::Break(false),
-            TypeParamBound::Verbatim(t) => ControlFlow::Break(tokens_trailing_brace(t)),
+            TypeParamBound::Verbatim(t) => ControlFlow::Break(false), //FIXMEtokens_trailing_brace(t)
         }
     }
 

@@ -316,9 +316,9 @@ impl PartialEq for crate::Expr {
             (crate::Expr::Unary(self0), crate::Expr::Unary(other0)) => self0 == other0,
             #[cfg(feature = "full")]
             (crate::Expr::Unsafe(self0), crate::Expr::Unsafe(other0)) => self0 == other0,
-            (crate::Expr::Verbatim(self0), crate::Expr::Verbatim(other0)) => {
-                TokenStreamHelper(self0) == TokenStreamHelper(other0)
-            }
+//            (crate::Expr::Verbatim(self0), crate::Expr::Verbatim(other0)) => {
+//                TokenStreamHelper(self0) == TokenStreamHelper(other0)
+//            }
             #[cfg(feature = "full")]
             (crate::Expr::While(self0), crate::Expr::While(other0)) => self0 == other0,
             #[cfg(feature = "full")]
@@ -854,13 +854,13 @@ impl PartialEq for crate::ForeignItem {
             (crate::ForeignItem::Type(self0), crate::ForeignItem::Type(other0)) => {
                 self0 == other0
             }
-            (crate::ForeignItem::Macro(self0), crate::ForeignItem::Macro(other0)) => {
-                self0 == other0
-            }
-            (
-                crate::ForeignItem::Verbatim(self0),
-                crate::ForeignItem::Verbatim(other0),
-            ) => TokenStreamHelper(self0) == TokenStreamHelper(other0),
+            // (crate::ForeignItem::Macro(self0), crate::ForeignItem::Macro(other0)) => {
+            //     self0 == other0
+            // }
+            // (
+            //     crate::ForeignItem::Verbatim(self0),
+            //     crate::ForeignItem::Verbatim(other0),
+            // ) => TokenStreamHelper(self0) == TokenStreamHelper(other0),
             _ => false,
         }
     }
@@ -996,9 +996,9 @@ impl PartialEq for crate::ImplItem {
             (crate::ImplItem::Macro(self0), crate::ImplItem::Macro(other0)) => {
                 self0 == other0
             }
-            (crate::ImplItem::Verbatim(self0), crate::ImplItem::Verbatim(other0)) => {
-                TokenStreamHelper(self0) == TokenStreamHelper(other0)
-            }
+            // (crate::ImplItem::Verbatim(self0), crate::ImplItem::Verbatim(other0)) => {
+            //     TokenStreamHelper(self0) == TokenStreamHelper(other0)
+            // }
             _ => false,
         }
     }
@@ -1090,9 +1090,9 @@ impl PartialEq for crate::Item {
             (crate::Item::Type(self0), crate::Item::Type(other0)) => self0 == other0,
             (crate::Item::Union(self0), crate::Item::Union(other0)) => self0 == other0,
             (crate::Item::Use(self0), crate::Item::Use(other0)) => self0 == other0,
-            (crate::Item::Verbatim(self0), crate::Item::Verbatim(other0)) => {
-                TokenStreamHelper(self0) == TokenStreamHelper(other0)
-            }
+            // (crate::Item::Verbatim(self0), crate::Item::Verbatim(other0)) => {
+            //     TokenStreamHelper(self0) == TokenStreamHelper(other0)
+            // }
             _ => false,
         }
     }
@@ -1306,9 +1306,9 @@ impl PartialEq for crate::Lit {
             (crate::Lit::Int(self0), crate::Lit::Int(other0)) => self0 == other0,
             (crate::Lit::Float(self0), crate::Lit::Float(other0)) => self0 == other0,
             (crate::Lit::Bool(self0), crate::Lit::Bool(other0)) => self0 == other0,
-            (crate::Lit::Verbatim(self0), crate::Lit::Verbatim(other0)) => {
-                self0.to_string() == other0.to_string()
-            }
+            // (crate::Lit::Verbatim(self0), crate::Lit::Verbatim(other0)) => {
+            //     self0.to_string() == other0.to_string()
+            // }
             _ => false,
         }
     }
@@ -1458,9 +1458,9 @@ impl PartialEq for crate::Pat {
                 self0 == other0
             }
             (crate::Pat::Type(self0), crate::Pat::Type(other0)) => self0 == other0,
-            (crate::Pat::Verbatim(self0), crate::Pat::Verbatim(other0)) => {
-                TokenStreamHelper(self0) == TokenStreamHelper(other0)
-            }
+            // (crate::Pat::Verbatim(self0), crate::Pat::Verbatim(other0)) => {
+            //     TokenStreamHelper(self0) == TokenStreamHelper(other0)
+            // }
             (crate::Pat::Wild(self0), crate::Pat::Wild(other0)) => self0 == other0,
             _ => false,
         }
@@ -1802,9 +1802,9 @@ impl PartialEq for crate::TraitItem {
             (crate::TraitItem::Macro(self0), crate::TraitItem::Macro(other0)) => {
                 self0 == other0
             }
-            (crate::TraitItem::Verbatim(self0), crate::TraitItem::Verbatim(other0)) => {
-                TokenStreamHelper(self0) == TokenStreamHelper(other0)
-            }
+            // (crate::TraitItem::Verbatim(self0), crate::TraitItem::Verbatim(other0)) => {
+            //     TokenStreamHelper(self0) == TokenStreamHelper(other0)
+            // }
             _ => false,
         }
     }
@@ -1883,9 +1883,9 @@ impl PartialEq for crate::Type {
                 self0 == other0
             }
             (crate::Type::Tuple(self0), crate::Type::Tuple(other0)) => self0 == other0,
-            (crate::Type::Verbatim(self0), crate::Type::Verbatim(other0)) => {
-                TokenStreamHelper(self0) == TokenStreamHelper(other0)
-            }
+            // (crate::Type::Verbatim(self0), crate::Type::Verbatim(other0)) => {
+            //     TokenStreamHelper(self0) == TokenStreamHelper(other0)
+            // }
             _ => false,
         }
     }
@@ -1990,10 +1990,10 @@ impl PartialEq for crate::TypeParamBound {
                 crate::TypeParamBound::Lifetime(self0),
                 crate::TypeParamBound::Lifetime(other0),
             ) => self0 == other0,
-            (
-                crate::TypeParamBound::Verbatim(self0),
-                crate::TypeParamBound::Verbatim(other0),
-            ) => TokenStreamHelper(self0) == TokenStreamHelper(other0),
+            // (
+            //     crate::TypeParamBound::Verbatim(self0),
+            //     crate::TypeParamBound::Verbatim(other0),
+            // ) => TokenStreamHelper(self0) == TokenStreamHelper(other0),
             _ => false,
         }
     }

@@ -2,6 +2,7 @@ ast_enum! {
     /// A binary operator: `+`, `+=`, `&`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum BinOp {
         /// The `+` operator (addition)
         Add(Token![+]),
@@ -66,6 +67,7 @@ ast_enum! {
     /// A unary operator: `*`, `!`, `-`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum UnOp {
         /// The `*` operator for dereferencing
         Deref(Token![*]),

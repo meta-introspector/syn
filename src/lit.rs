@@ -21,6 +21,7 @@ ast_enum_of_structs! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum Lit {
         /// A UTF-8 string literal: `"foo"`.
         Str(LitStr),
@@ -48,13 +49,15 @@ ast_enum_of_structs! {
         /// A boolean literal: `true` or `false`.
         Bool(LitBool),
 
-        /// A raw token literal not interpreted by Syn.
-        Verbatim(Literal),
     }
 }
 
+	/// A raw token literal not interpreted by Syn.
+        // Verbatim(String),
+
 ast_struct! {
     /// A UTF-8 string literal: `"foo"`.
+    #[derive(serde::Serialize)]
     pub struct LitStr {
         repr: Box<LitRepr>,
     }
@@ -62,6 +65,7 @@ ast_struct! {
 
 ast_struct! {
     /// A byte string literal: `b"foo"`.
+         #[derive(serde::Serialize)]
     pub struct LitByteStr {
         repr: Box<LitRepr>,
     }
@@ -69,6 +73,7 @@ ast_struct! {
 
 ast_struct! {
     /// A nul-terminated C-string literal: `c"foo"`.
+         #[derive(serde::Serialize)]
     pub struct LitCStr {
         repr: Box<LitRepr>,
     }
@@ -76,6 +81,7 @@ ast_struct! {
 
 ast_struct! {
     /// A byte literal: `b'f'`.
+         #[derive(serde::Serialize)]
     pub struct LitByte {
         repr: Box<LitRepr>,
     }
@@ -83,24 +89,30 @@ ast_struct! {
 
 ast_struct! {
     /// A character literal: `'a'`.
+         #[derive(serde::Serialize)]
     pub struct LitChar {
         repr: Box<LitRepr>,
     }
 }
 
-struct LitRepr {
+#[derive(serde::Serialize)]
+pub struct LitRepr {
+
+    #[serde(serialize_with = "crate::serialize::serialize_literal")]
     token: Literal,
     suffix: Box<str>,
 }
 
 ast_struct! {
     /// An integer literal: `1` or `1u16`.
+         #[derive(serde::Serialize)]
     pub struct LitInt {
         repr: Box<LitIntRepr>,
     }
 }
-
-struct LitIntRepr {
+#[derive(serde::Serialize)]
+pub struct LitIntRepr {
+    #[serde(serialize_with = "crate::serialize::serialize_literal")]
     token: Literal,
     digits: Box<str>,
     suffix: Box<str>,
@@ -110,12 +122,15 @@ ast_struct! {
     /// A floating point literal: `1f64` or `1.0e10f64`.
     ///
     /// Must be finite. May not be infinite or NaN.
+    #[derive(serde::Serialize)]
     pub struct LitFloat {
         repr: Box<LitFloatRepr>,
     }
 }
-
-struct LitFloatRepr {
+#[derive(serde::Serialize)]
+pub struct LitFloatRepr {
+    
+    #[serde(serialize_with = "crate::serialize::serialize_literal")]
     token: Literal,
     digits: Box<str>,
     suffix: Box<str>,
@@ -123,8 +138,11 @@ struct LitFloatRepr {
 
 ast_struct! {
     /// A boolean literal: `true` or `false`.
+    #[derive(serde::Serialize)]
     pub struct LitBool {
         pub value: bool,
+	#[serde(serialize_with = "crate::serialize::serialize_span")]
+
         pub span: Span,
     }
 }
@@ -830,7 +848,8 @@ pub_if_not_doc! {
 /// The style of a string literal, either plain quoted or a raw string like
 /// `r##"data"##`.
 #[doc(hidden)] // https://github.com/dtolnay/syn/issues/1566
-pub enum StrStyle {
+     #[derive(serde::Serialize)]
+    pub enum StrStyle {
     /// An ordinary string like `"data"`.
     Cooked,
     /// A raw string like `r##"data"##`.
@@ -1208,7 +1227,7 @@ mod value {
                         });
                     }
                 }
-                b'(' if repr == "(/*ERROR*/)" => return Lit::Verbatim(token),
+//                b'(' if repr == "(/*ERROR*/)" => return Lit::Verbatim(token.to_string()),
                 _ => {}
             }
 
@@ -1224,7 +1243,8 @@ mod value {
                 Lit::Char(lit) => lit.suffix(),
                 Lit::Int(lit) => lit.suffix(),
                 Lit::Float(lit) => lit.suffix(),
-                Lit::Bool(_) | Lit::Verbatim(_) => "",
+                Lit::Bool(_) => "",
+		//| Lit::Verbatim(_) => "",
             }
         }
 
@@ -1238,7 +1258,7 @@ mod value {
                 Lit::Int(lit) => lit.span(),
                 Lit::Float(lit) => lit.span(),
                 Lit::Bool(lit) => lit.span,
-                Lit::Verbatim(lit) => lit.span(),
+//                Lit::Verbatim(lit) => Span {},
             }
         }
 
@@ -1252,7 +1272,7 @@ mod value {
                 Lit::Int(lit) => lit.set_span(span),
                 Lit::Float(lit) => lit.set_span(span),
                 Lit::Bool(lit) => lit.span = span,
-                Lit::Verbatim(lit) => lit.set_span(span),
+//                Lit::Verbatim(lit) => lit.set_span(span),
             }
         }
     }

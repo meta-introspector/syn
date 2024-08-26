@@ -15,8 +15,13 @@ use std::hash::{Hash, Hasher};
 ///   the XID_Start property.
 /// - All following characters must be Unicode code points with the XID_Continue
 ///   property.
+     #[derive(serde::Serialize)]
 pub struct Lifetime {
+
+    #[serde(serialize_with = "crate::serialize::serialize_span")]
     pub apostrophe: Span,
+    #[serde(serialize_with = "crate::serialize::serialize_ident")]
+
     pub ident: Ident,
 }
 

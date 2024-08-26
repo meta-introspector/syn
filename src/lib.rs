@@ -1019,3 +1019,5 @@ pub fn parse_file(mut content: &str) -> Result<File> {
     file.shebang = shebang;
     Ok(file)
 }
+
+mod serialize;

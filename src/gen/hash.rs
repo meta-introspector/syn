@@ -499,8 +499,9 @@ impl Hash for crate::Expr {
                 v0.hash(state);
             }
             crate::Expr::Verbatim(v0) => {
-                state.write_u8(36u8);
-                TokenStreamHelper(v0).hash(state);
+		//     state.write_u8(36u8);
+		//     TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
             }
             #[cfg(feature = "full")]
             crate::Expr::While(v0) => {
@@ -1127,8 +1128,9 @@ impl Hash for crate::ForeignItem {
                 v0.hash(state);
             }
             crate::ForeignItem::Verbatim(v0) => {
-                state.write_u8(4u8);
-                TokenStreamHelper(v0).hash(state);
+            //     state.write_u8(4u8);
+		//     TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
             }
         }
     }
@@ -1280,8 +1282,9 @@ impl Hash for crate::ImplItem {
                 v0.hash(state);
             }
             crate::ImplItem::Verbatim(v0) => {
-                state.write_u8(4u8);
-                TokenStreamHelper(v0).hash(state);
+            //     state.write_u8(4u8);
+		//     TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
             }
         }
     }
@@ -1422,9 +1425,10 @@ impl Hash for crate::Item {
                 v0.hash(state);
             }
             crate::Item::Verbatim(v0) => {
-                state.write_u8(15u8);
-                TokenStreamHelper(v0).hash(state);
-            }
+		//     state.write_u8(15u8);
+		//     TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
+             }
         }
     }
 }
@@ -1706,10 +1710,11 @@ impl Hash for crate::Lit {
                 state.write_u8(7u8);
                 v0.hash(state);
             }
-            crate::Lit::Verbatim(v0) => {
-                state.write_u8(8u8);
-                v0.to_string().hash(state);
-            }
+            //crate::Lit::Verbatim(v0) => {
+            //     state.write_u8(8u8);
+		//     v0.to_string().hash(state);
+	    //v0.hash(state);
+	    //            }
         }
     }
 }
@@ -1903,8 +1908,9 @@ impl Hash for crate::Pat {
                 v0.hash(state);
             }
             crate::Pat::Verbatim(v0) => {
-                state.write_u8(15u8);
-                TokenStreamHelper(v0).hash(state);
+                //state.write_u8(15u8);
+                //TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
             }
             crate::Pat::Wild(v0) => {
                 state.write_u8(16u8);
@@ -2301,8 +2307,9 @@ impl Hash for crate::TraitItem {
                 v0.hash(state);
             }
             crate::TraitItem::Verbatim(v0) => {
-                state.write_u8(4u8);
-                TokenStreamHelper(v0).hash(state);
+                //state.write_u8(4u8);
+		//                TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
             }
         }
     }
@@ -2426,8 +2433,9 @@ impl Hash for crate::Type {
                 v0.hash(state);
             }
             crate::Type::Verbatim(v0) => {
-                state.write_u8(14u8);
-                TokenStreamHelper(v0).hash(state);
+                //state.write_u8(14u8);
+                //TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
             }
         }
     }
@@ -2536,8 +2544,9 @@ impl Hash for crate::TypeParamBound {
                 v0.hash(state);
             }
             crate::TypeParamBound::Verbatim(v0) => {
-                state.write_u8(2u8);
-                TokenStreamHelper(v0).hash(state);
+                //state.write_u8(2u8);
+                //TokenStreamHelper(v0).hash(state);
+		v0.hash(state);
             }
         }
     }

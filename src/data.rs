@@ -9,9 +9,12 @@ use crate::ty::Type;
 ast_struct! {
     /// An enum variant.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Variant {
         pub attrs: Vec<Attribute>,
 
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         /// Name of the variant.
         pub ident: Ident,
 
@@ -32,6 +35,7 @@ ast_enum_of_structs! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum Fields {
         /// Named fields of a struct or struct variant such as `Point { x: f64,
         /// y: f64 }`.
@@ -49,6 +53,7 @@ ast_struct! {
     /// Named fields of a struct or struct variant such as `Point { x: f64,
     /// y: f64 }`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct FieldsNamed {
         pub brace_token: token::Brace,
         pub named: Punctuated<Field, Token![,]>,
@@ -58,6 +63,7 @@ ast_struct! {
 ast_struct! {
     /// Unnamed fields of a tuple struct or tuple variant such as `Some(T)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct FieldsUnnamed {
         pub paren_token: token::Paren,
         pub unnamed: Punctuated<Field, Token![,]>,
@@ -181,6 +187,7 @@ impl<'a> IntoIterator for &'a mut Fields {
 ast_struct! {
     /// A field of a struct or enum variant.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Field {
         pub attrs: Vec<Attribute>,
 
@@ -191,6 +198,7 @@ ast_struct! {
         /// Name of the field, if any.
         ///
         /// Fields of tuple structs have no names.
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident")]
         pub ident: Option<Ident>,
 
         pub colon_token: Option<Token![:]>,
@@ -199,7 +207,9 @@ ast_struct! {
     }
 }
 
+#[derive(serde::Serialize)]
 pub struct Members<'a> {
+    #[serde(serialize_with = "crate::serialize::serialize_punt_iter_field")]
     fields: punctuated::Iter<'a, Field>,
     index: u32,
 }
@@ -250,7 +260,7 @@ pub(crate) mod parsing {
     use crate::restriction::{FieldMutability, Visibility};
     use crate::token;
     use crate::ty::Type;
-    use crate::verbatim;
+//    use crate::verbatim;
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
     impl Parse for Variant {
@@ -277,7 +287,7 @@ pub(crate) mod parsing {
                     if discriminant.is_ok() {
                         input.advance_to(&ahead);
                     } else if scan_lenient_discriminant(input).is_ok() {
-                        discriminant = Ok(Expr::Verbatim(verbatim::between(&begin, input)));
+                        discriminant = Ok(Expr::Verbatim("verbatim::between(&begin, input)".to_string()));
                     }
                     discriminant?
                 };
@@ -418,7 +428,7 @@ pub(crate) mod parsing {
                 let begin = input.fork();
                 input.call(Ident::parse_any)?;
                 input.parse::<FieldsNamed>()?;
-                Type::Verbatim(verbatim::between(&begin, input))
+                Type::Verbatim("verbatim::between(&begin, input)".to_string())
             } else {
                 input.parse()?
             };

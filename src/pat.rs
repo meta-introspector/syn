@@ -5,7 +5,6 @@ use crate::path::{Path, QSelf};
 use crate::punctuated::Punctuated;
 use crate::token;
 use crate::ty::Type;
-use proc_macro2::TokenStream;
 
 pub use crate::expr::{
     ExprConst as PatConst, ExprLit as PatLit, ExprMacro as PatMacro, ExprPath as PatPath,
@@ -23,6 +22,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[non_exhaustive]
+    #[derive(serde::Serialize)]
     pub enum Pat {
         /// A const block: `const { ... }`.
         Const(PatConst),
@@ -76,7 +76,7 @@ ast_enum_of_structs! {
         Type(PatType),
 
         /// Tokens in pattern position not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         /// A pattern that matches any value: `_`.
         Wild(PatWild),
@@ -107,10 +107,12 @@ ast_struct! {
     /// It may also be a unit struct or struct variant (e.g. `None`), or a
     /// constant; these cannot be distinguished syntactically.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatIdent {
         pub attrs: Vec<Attribute>,
         pub by_ref: Option<Token![ref]>,
         pub mutability: Option<Token![mut]>,
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub subpat: Option<(Token![@], Box<Pat>)>,
     }
@@ -119,6 +121,7 @@ ast_struct! {
 ast_struct! {
     /// A pattern that matches any one of a set of cases.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatOr {
         pub attrs: Vec<Attribute>,
         pub leading_vert: Option<Token![|]>,
@@ -129,6 +132,7 @@ ast_struct! {
 ast_struct! {
     /// A parenthesized pattern: `(A | B)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatParen {
         pub attrs: Vec<Attribute>,
         pub paren_token: token::Paren,
@@ -139,6 +143,7 @@ ast_struct! {
 ast_struct! {
     /// A reference pattern: `&mut var`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatReference {
         pub attrs: Vec<Attribute>,
         pub and_token: Token![&],
@@ -150,6 +155,7 @@ ast_struct! {
 ast_struct! {
     /// The dots in a tuple or slice pattern: `[0, 1, ..]`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatRest {
         pub attrs: Vec<Attribute>,
         pub dot2_token: Token![..],
@@ -159,6 +165,7 @@ ast_struct! {
 ast_struct! {
     /// A dynamically sized slice pattern: `[a, b, ref i @ .., y, z]`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatSlice {
         pub attrs: Vec<Attribute>,
         pub bracket_token: token::Bracket,
@@ -169,6 +176,7 @@ ast_struct! {
 ast_struct! {
     /// A struct or struct variant pattern: `Variant { x, y, .. }`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatStruct {
         pub attrs: Vec<Attribute>,
         pub qself: Option<QSelf>,
@@ -182,6 +190,7 @@ ast_struct! {
 ast_struct! {
     /// A tuple pattern: `(a, b)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatTuple {
         pub attrs: Vec<Attribute>,
         pub paren_token: token::Paren,
@@ -192,6 +201,7 @@ ast_struct! {
 ast_struct! {
     /// A tuple struct or tuple variant pattern: `Variant(x, y, .., z)`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatTupleStruct {
         pub attrs: Vec<Attribute>,
         pub qself: Option<QSelf>,
@@ -204,6 +214,7 @@ ast_struct! {
 ast_struct! {
     /// A type ascription pattern: `foo: f64`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatType {
         pub attrs: Vec<Attribute>,
         pub pat: Box<Pat>,
@@ -215,6 +226,7 @@ ast_struct! {
 ast_struct! {
     /// A pattern that matches any value: `_`.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct PatWild {
         pub attrs: Vec<Attribute>,
         pub underscore_token: Token![_],
@@ -227,6 +239,7 @@ ast_struct! {
     /// Patterns like the fields of Foo `{ x, ref y, ref mut z }` are treated
     /// the same as `x: x, y: ref y, z: ref mut z` but there is no colon token.
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+         #[derive(serde::Serialize)]
     pub struct FieldPat {
         pub attrs: Vec<Attribute>,
         pub member: Member,
@@ -322,9 +335,10 @@ pub(crate) mod parsing {
                 input.call(pat_slice).map(Pat::Slice)
             } else if lookahead.peek(Token![..]) && !input.peek(Token![...]) {
                 pat_range_half_open(input)
-            } else if lookahead.peek(Token![const]) {
-                input.call(pat_const).map(Pat::Verbatim)
-            } else {
+            } //else if lookahead.peek(Token![const]) {
+                //input.call(pat_const).map(Pat::Verbatim)
+            //}
+	    else {
                 Err(lookahead.error())
             }
         }
@@ -463,7 +477,7 @@ pub(crate) mod parsing {
     fn pat_box(begin: ParseBuffer, input: ParseStream) -> Result<Pat> {
         input.parse::<Token![box]>()?;
         Pat::parse_single(input)?;
-        Ok(Pat::Verbatim(verbatim::between(&begin, input)))
+        Ok(Pat::Verbatim("verbatim::between(&begin, input)".to_string()))
     }
 
     fn pat_ident(input: ParseStream) -> Result<PatIdent> {
@@ -582,7 +596,7 @@ pub(crate) mod parsing {
         };
 
         let pat = if boxed.is_some() {
-            Pat::Verbatim(verbatim::between(&begin, input))
+            Pat::Verbatim("verbatim::between(&begin, input)".to_string())
         } else {
             Pat::Ident(PatIdent {
                 attrs: Vec::new(),

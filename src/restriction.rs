@@ -11,6 +11,7 @@ ast_enum! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum Visibility {
         /// A public visibility level: `pub`.
         Public(Token![pub]),
@@ -28,6 +29,7 @@ ast_struct! {
     /// A visibility level restricted to some path: `pub(self)` or
     /// `pub(super)` or `pub(crate)` or `pub(in some::module)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct VisRestricted {
         pub pub_token: Token![pub],
         pub paren_token: token::Paren,
@@ -40,6 +42,7 @@ ast_enum! {
     /// Unused, but reserved for RFC 3323 restrictions.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum FieldMutability {
         None,
 

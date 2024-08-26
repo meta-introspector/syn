@@ -6,7 +6,6 @@ use crate::path::Path;
 use crate::punctuated::{Iter, IterMut, Punctuated};
 use crate::token;
 use crate::ty::Type;
-use proc_macro2::TokenStream;
 #[cfg(all(feature = "printing", feature = "extra-traits"))]
 use std::fmt::{self, Debug};
 #[cfg(all(feature = "printing", feature = "extra-traits"))]
@@ -23,6 +22,7 @@ ast_struct! {
     /// [generic parameters]: https://doc.rust-lang.org/stable/reference/items/generics.html#generic-parameters
     /// [where clause]: https://doc.rust-lang.org/stable/reference/items/generics.html#where-clauses
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Generics {
         pub lt_token: Option<Token![<]>,
         pub params: Punctuated<GenericParam, Token![,]>,
@@ -41,6 +41,7 @@ ast_enum_of_structs! {
     ///
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum GenericParam {
         /// A lifetime parameter: `'a: 'b + 'c + 'd`.
         Lifetime(LifetimeParam),
@@ -56,6 +57,7 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A lifetime definition: `'a: 'b + 'c + 'd`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct LifetimeParam {
         pub attrs: Vec<Attribute>,
         pub lifetime: Lifetime,
@@ -67,8 +69,10 @@ ast_struct! {
 ast_struct! {
     /// A generic type parameter: `T: Into<String>`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeParam {
         pub attrs: Vec<Attribute>,
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Option<Token![:]>,
         pub bounds: Punctuated<TypeParamBound, Token![+]>,
@@ -80,9 +84,11 @@ ast_struct! {
 ast_struct! {
     /// A const generic parameter: `const LENGTH: usize`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct ConstParam {
         pub attrs: Vec<Attribute>,
         pub const_token: Token![const],
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Type,
@@ -182,7 +188,8 @@ impl Generics {
     }
 }
 
-pub struct Lifetimes<'a>(Iter<'a, GenericParam>);
+//#[derive(serde::Serialize)]
+    pub struct Lifetimes<'a>(Iter<'a, GenericParam>);
 
 impl<'a> Iterator for Lifetimes<'a> {
     type Item = &'a LifetimeParam;
@@ -200,7 +207,8 @@ impl<'a> Iterator for Lifetimes<'a> {
     }
 }
 
-pub struct LifetimesMut<'a>(IterMut<'a, GenericParam>);
+//     #[derive(serde::Serialize)]
+    pub struct LifetimesMut<'a>(IterMut<'a, GenericParam>);
 
 impl<'a> Iterator for LifetimesMut<'a> {
     type Item = &'a mut LifetimeParam;
@@ -218,7 +226,8 @@ impl<'a> Iterator for LifetimesMut<'a> {
     }
 }
 
-pub struct TypeParams<'a>(Iter<'a, GenericParam>);
+//     #[derive(serde::Serialize)]
+    pub struct TypeParams<'a>(Iter<'a, GenericParam>);
 
 impl<'a> Iterator for TypeParams<'a> {
     type Item = &'a TypeParam;
@@ -236,7 +245,8 @@ impl<'a> Iterator for TypeParams<'a> {
     }
 }
 
-pub struct TypeParamsMut<'a>(IterMut<'a, GenericParam>);
+//     #[derive(serde::Serialize)]
+    pub struct TypeParamsMut<'a>(IterMut<'a, GenericParam>);
 
 impl<'a> Iterator for TypeParamsMut<'a> {
     type Item = &'a mut TypeParam;
@@ -254,7 +264,8 @@ impl<'a> Iterator for TypeParamsMut<'a> {
     }
 }
 
-pub struct ConstParams<'a>(Iter<'a, GenericParam>);
+//     #[derive(serde::Serialize)]
+    pub struct ConstParams<'a>(Iter<'a, GenericParam>);
 
 impl<'a> Iterator for ConstParams<'a> {
     type Item = &'a ConstParam;
@@ -272,7 +283,8 @@ impl<'a> Iterator for ConstParams<'a> {
     }
 }
 
-pub struct ConstParamsMut<'a>(IterMut<'a, GenericParam>);
+//     #[derive(serde::Serialize)]
+    pub struct ConstParamsMut<'a>(IterMut<'a, GenericParam>);
 
 impl<'a> Iterator for ConstParamsMut<'a> {
     type Item = &'a mut ConstParam;
@@ -296,7 +308,8 @@ impl<'a> Iterator for ConstParamsMut<'a> {
     docsrs,
     doc(cfg(all(any(feature = "full", feature = "derive"), feature = "printing")))
 )]
-pub struct ImplGenerics<'a>(&'a Generics);
+     #[derive(serde::Serialize)]
+    pub struct ImplGenerics<'a>(&'a Generics);
 
 /// Returned by `Generics::split_for_impl`.
 #[cfg(feature = "printing")]
@@ -304,7 +317,8 @@ pub struct ImplGenerics<'a>(&'a Generics);
     docsrs,
     doc(cfg(all(any(feature = "full", feature = "derive"), feature = "printing")))
 )]
-pub struct TypeGenerics<'a>(&'a Generics);
+     #[derive(serde::Serialize)]
+    pub struct TypeGenerics<'a>(&'a Generics);
 
 /// Returned by `TypeGenerics::as_turbofish`.
 #[cfg(feature = "printing")]
@@ -312,7 +326,8 @@ pub struct TypeGenerics<'a>(&'a Generics);
     docsrs,
     doc(cfg(all(any(feature = "full", feature = "derive"), feature = "printing")))
 )]
-pub struct Turbofish<'a>(&'a Generics);
+     #[derive(serde::Serialize)]
+    pub struct Turbofish<'a>(&'a Generics);
 
 #[cfg(feature = "printing")]
 macro_rules! generics_wrapper_impls {
@@ -376,6 +391,7 @@ impl<'a> TypeGenerics<'a> {
 ast_struct! {
     /// A set of bound lifetimes: `for<'a, 'b, 'c>`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct BoundLifetimes {
         pub for_token: Token![for],
         pub lt_token: Token![<],
@@ -423,16 +439,18 @@ ast_enum_of_structs! {
     /// A trait or lifetime used as a bound on a type parameter.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum TypeParamBound {
         Trait(TraitBound),
         Lifetime(Lifetime),
-        Verbatim(TokenStream),
+        Verbatim(String),
     }
 }
 
 ast_struct! {
     /// A trait used as a bound on a type parameter.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TraitBound {
         pub paren_token: Option<token::Paren>,
         pub modifier: TraitBoundModifier,
@@ -447,6 +465,7 @@ ast_enum! {
     /// A modifier on a trait bound, currently only used for the `?` in
     /// `?Sized`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum TraitBoundModifier {
         None,
         Maybe(Token![?]),
@@ -457,6 +476,7 @@ ast_struct! {
     /// A `where` clause in a definition: `where T: Deserialize<'de>, D:
     /// 'static`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct WhereClause {
         pub where_token: Token![where],
         pub predicates: Punctuated<WherePredicate, Token![,]>,
@@ -473,6 +493,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+         #[derive(serde::Serialize)]
     pub enum WherePredicate {
         /// A lifetime predicate in a `where` clause: `'a: 'b + 'c`.
         Lifetime(PredicateLifetime),
@@ -485,6 +506,7 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A lifetime predicate in a `where` clause: `'a: 'b + 'c`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct PredicateLifetime {
         pub lifetime: Lifetime,
         pub colon_token: Token![:],
@@ -495,6 +517,7 @@ ast_struct! {
 ast_struct! {
     /// A type predicate in a `where` clause: `for<'c> Foo<'c>: Trait<'c>`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct PredicateType {
         /// Any lifetimes from a `for` binding
         pub lifetimes: Option<BoundLifetimes>,
@@ -523,7 +546,7 @@ pub(crate) mod parsing {
     use crate::punctuated::Punctuated;
     use crate::token;
     use crate::ty::Type;
-    use crate::verbatim;
+    
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
     impl Parse for Generics {
@@ -767,7 +790,7 @@ pub(crate) mod parsing {
                     }
                 }
                 input.parse::<Token![>]>()?;
-                return Ok(TypeParamBound::Verbatim(verbatim::between(&begin, input)));
+                return Ok(TypeParamBound::Verbatim("verbatim::between(&begin, input)".to_string()));
             }
 
             let content;
@@ -788,7 +811,7 @@ pub(crate) mod parsing {
             bound.paren_token = paren_token;
 
             if is_tilde_const {
-                Ok(TypeParamBound::Verbatim(verbatim::between(&begin, input)))
+                Ok(TypeParamBound::Verbatim("verbatim::between(&begin, input)".to_string()))
             } else {
                 Ok(TypeParamBound::Trait(bound))
             }

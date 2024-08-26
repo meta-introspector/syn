@@ -1344,7 +1344,7 @@ impl Clone for crate::Lit {
             crate::Lit::Int(v0) => crate::Lit::Int(v0.clone()),
             crate::Lit::Float(v0) => crate::Lit::Float(v0.clone()),
             crate::Lit::Bool(v0) => crate::Lit::Bool(v0.clone()),
-            crate::Lit::Verbatim(v0) => crate::Lit::Verbatim(v0.clone()),
+//            crate::Lit::Verbatim(v0) => crate::Lit::Verbatim(v0.clone()),
         }
     }
 }

@@ -2635,7 +2635,7 @@ where
         crate::Lit::Int(_binding_0) => crate::Lit::Int(f.fold_lit_int(_binding_0)),
         crate::Lit::Float(_binding_0) => crate::Lit::Float(f.fold_lit_float(_binding_0)),
         crate::Lit::Bool(_binding_0) => crate::Lit::Bool(f.fold_lit_bool(_binding_0)),
-        crate::Lit::Verbatim(_binding_0) => crate::Lit::Verbatim(_binding_0),
+//        crate::Lit::Verbatim(_binding_0) => crate::Lit::Verbatim(_binding_0),
     }
 }
 pub fn fold_lit_bool<F>(f: &mut F, node: crate::LitBool) -> crate::LitBool

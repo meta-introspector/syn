@@ -122,6 +122,7 @@ use std::ops::{Deref, DerefMut};
 ///
 /// This trait is sealed and cannot be implemented for types outside of Syn.
 #[cfg(feature = "parsing")]
+
 pub trait Token: private::Sealed {
     // Not public API.
     #[doc(hidden)]
@@ -207,7 +208,9 @@ macro_rules! define_keywords {
             /// [`Token!`] macro instead.
             ///
             /// [`Token!`]: crate::token
+	    #[derive(serde::Serialize)]
             pub struct $name {
+		#[serde(serialize_with = "crate::serialize::serialize_span")]
                 pub span: Span,
             }
 
@@ -334,7 +337,10 @@ macro_rules! define_punctuation_structs {
             /// [`Token!`] macro instead.
             ///
             /// [`Token!`]: crate::token
+	    #[derive(serde::Serialize)]
             pub struct $name {
+
+		#[serde(serialize_with = "crate::serialize::serialize_spans")]
                 pub spans: [Span; $len],
             }
 
@@ -443,7 +449,9 @@ macro_rules! define_delimiters {
     ($($delim:ident pub struct $name:ident #[$doc:meta])*) => {
         $(
             #[$doc]
+	        #[derive(serde::Serialize)]
             pub struct $name {
+		#[serde(serialize_with = "crate::serialize::serialize_delimspan")]
                 pub span: DelimSpan,
             }
 
@@ -570,7 +578,9 @@ impl Token for Underscore {
 impl private::Sealed for Underscore {}
 
 /// None-delimited group
+    #[derive(serde::Serialize)]
 pub struct Group {
+    #[serde(serialize_with = "crate::serialize::serialize_span")]
     pub span: Span,
 }
 

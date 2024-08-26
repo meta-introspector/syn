@@ -8,7 +8,6 @@ use crate::mac::Macro;
 use crate::path::{Path, QSelf};
 use crate::punctuated::Punctuated;
 use crate::token;
-use proc_macro2::TokenStream;
 
 ast_enum_of_structs! {
     /// The possible types that a Rust value could have.
@@ -20,6 +19,7 @@ ast_enum_of_structs! {
     /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[non_exhaustive]
+    #[derive(serde::Serialize)]
     pub enum Type {
         /// A fixed size array type: `[T; n]`.
         Array(TypeArray),
@@ -67,7 +67,7 @@ ast_enum_of_structs! {
         Tuple(TypeTuple),
 
         /// Tokens in type position not interpreted by Syn.
-        Verbatim(TokenStream),
+        Verbatim(String),
 
         // For testing exhaustiveness in downstream code, use the following idiom:
         //
@@ -92,6 +92,8 @@ ast_enum_of_structs! {
 ast_struct! {
     /// A fixed size array type: `[T; n]`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+
+         #[derive(serde::Serialize)]
     pub struct TypeArray {
         pub bracket_token: token::Bracket,
         pub elem: Box<Type>,
@@ -103,6 +105,7 @@ ast_struct! {
 ast_struct! {
     /// A bare function type: `fn(usize) -> bool`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeBareFn {
         pub lifetimes: Option<BoundLifetimes>,
         pub unsafety: Option<Token![unsafe]>,
@@ -118,6 +121,7 @@ ast_struct! {
 ast_struct! {
     /// A type contained within invisible delimiters.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeGroup {
         pub group_token: token::Group,
         pub elem: Box<Type>,
@@ -128,6 +132,7 @@ ast_struct! {
     /// An `impl Bound1 + Bound2 + Bound3` type where `Bound` is a trait or
     /// a lifetime.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeImplTrait {
         pub impl_token: Token![impl],
         pub bounds: Punctuated<TypeParamBound, Token![+]>,
@@ -137,6 +142,7 @@ ast_struct! {
 ast_struct! {
     /// Indication that a type should be inferred by the compiler: `_`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeInfer {
         pub underscore_token: Token![_],
     }
@@ -145,6 +151,7 @@ ast_struct! {
 ast_struct! {
     /// A macro in the type position.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeMacro {
         pub mac: Macro,
     }
@@ -153,6 +160,7 @@ ast_struct! {
 ast_struct! {
     /// The never type: `!`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeNever {
         pub bang_token: Token![!],
     }
@@ -161,6 +169,7 @@ ast_struct! {
 ast_struct! {
     /// A parenthesized type equivalent to the inner type.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeParen {
         pub paren_token: token::Paren,
         pub elem: Box<Type>,
@@ -171,6 +180,7 @@ ast_struct! {
     /// A path like `std::slice::Iter`, optionally qualified with a
     /// self-type as in `<Vec<T> as SomeTrait>::Associated`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypePath {
         pub qself: Option<QSelf>,
         pub path: Path,
@@ -180,6 +190,7 @@ ast_struct! {
 ast_struct! {
     /// A raw pointer type: `*const T` or `*mut T`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypePtr {
         pub star_token: Token![*],
         pub const_token: Option<Token![const]>,
@@ -191,6 +202,7 @@ ast_struct! {
 ast_struct! {
     /// A reference type: `&'a T` or `&'a mut T`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeReference {
         pub and_token: Token![&],
         pub lifetime: Option<Lifetime>,
@@ -202,6 +214,7 @@ ast_struct! {
 ast_struct! {
     /// A dynamically sized slice type: `[T]`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeSlice {
         pub bracket_token: token::Bracket,
         pub elem: Box<Type>,
@@ -212,6 +225,7 @@ ast_struct! {
     /// A trait object type `dyn Bound1 + Bound2 + Bound3` where `Bound` is a
     /// trait or a lifetime.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeTraitObject {
         pub dyn_token: Option<Token![dyn]>,
         pub bounds: Punctuated<TypeParamBound, Token![+]>,
@@ -221,6 +235,7 @@ ast_struct! {
 ast_struct! {
     /// A tuple type: `(A, B, C, String)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct TypeTuple {
         pub paren_token: token::Paren,
         pub elems: Punctuated<Type, Token![,]>,
@@ -230,6 +245,7 @@ ast_struct! {
 ast_struct! {
     /// The binary interface of a function: `extern "C"`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct Abi {
         pub extern_token: Token![extern],
         pub name: Option<LitStr>,
@@ -239,8 +255,10 @@ ast_struct! {
 ast_struct! {
     /// An argument in a function type: the `usize` in `fn(usize) -> bool`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct BareFnArg {
         pub attrs: Vec<Attribute>,
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident_token")]
         pub name: Option<(Ident, Token![:])>,
         pub ty: Type,
     }
@@ -249,8 +267,10 @@ ast_struct! {
 ast_struct! {
     /// The variadic argument of a function pointer like `fn(usize, ...)`.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub struct BareVariadic {
         pub attrs: Vec<Attribute>,
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident_token")]
         pub name: Option<(Ident, Token![:])>,
         pub dots: Token![...],
         pub comma: Option<Token![,]>,
@@ -260,6 +280,7 @@ ast_struct! {
 ast_enum! {
     /// Return type of a function signature.
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
+         #[derive(serde::Serialize)]
     pub enum ReturnType {
         /// Return type is not specified.
         ///
@@ -289,7 +310,7 @@ pub(crate) mod parsing {
         TypeImplTrait, TypeInfer, TypeMacro, TypeNever, TypeParen, TypePath, TypePtr,
         TypeReference, TypeSlice, TypeTraitObject, TypeTuple,
     };
-    use crate::verbatim;
+    
     use proc_macro2::Span;
 
     #[cfg_attr(docsrs, doc(cfg(feature = "parsing")))]
@@ -548,7 +569,7 @@ pub(crate) mod parsing {
             let star_token: Option<Token![*]> = input.parse()?;
             let bounds = TypeTraitObject::parse_bounds(dyn_span, input, allow_plus)?;
             return Ok(if star_token.is_some() {
-                Type::Verbatim(verbatim::between(&begin, input))
+                Type::Verbatim("verbatim::between(&begin, input)".to_string())
             } else {
                 Type::TraitObject(TypeTraitObject {
                     dyn_token: Some(dyn_token),
@@ -970,7 +991,7 @@ pub(crate) mod parsing {
             Some(ty) if !has_mut_self => ty,
             _ => {
                 name = None;
-                Type::Verbatim(verbatim::between(&begin, input))
+                Type::Verbatim("verbatim::between(&begin, input)".to_string())
             }
         };
 
