@@ -112,8 +112,7 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub by_ref: Option<Token![ref]>,
         pub mutability: Option<Token![mut]>,
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub subpat: Option<(Token![@], Box<Pat>)>,
     }

@@ -106,9 +106,7 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub const_token: Token![const],
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Token![:],
@@ -127,9 +125,7 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub enum_token: Token![enum],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub brace_token: token::Brace,
@@ -146,14 +142,10 @@ ast_struct! {
         pub vis: Visibility,
         pub extern_token: Token![extern],
         pub crate_token: Token![crate],
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
-
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	
+	#[serde(serialize_with = "crate::serialize::serialize_option_token_ident")]
         pub rename: Option<(Token![as], Ident)>,
         pub semi_token: Token![;],
     }
@@ -212,9 +204,7 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         /// The `example` in `macro_rules! example { ... }`.
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident")]
         pub ident: Option<Ident>,
         pub mac: Macro,
         pub semi_token: Option<Token![;]>,
@@ -230,9 +220,8 @@ ast_struct! {
         pub vis: Visibility,
         pub unsafety: Option<Token![unsafe]>,
         pub mod_token: Token![mod],
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
 
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub content: Option<(token::Brace, Vec<Item>)>,
         pub semi: Option<Token![;]>,
@@ -248,9 +237,8 @@ ast_struct! {
         pub vis: Visibility,
         pub static_token: Token![static],
         pub mutability: StaticMutability,
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
 
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Box<Type>,
@@ -268,9 +256,8 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub struct_token: Token![struct],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub fields: Fields,
@@ -289,9 +276,8 @@ ast_struct! {
         pub auto_token: Option<Token![auto]>,
         pub restriction: Option<ImplRestriction>,
         pub trait_token: Token![trait],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
 
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Option<Token![:]>,
@@ -309,9 +295,8 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub trait_token: Token![trait],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
 
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -328,9 +313,8 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub type_token: Token![type],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -347,9 +331,8 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub union_token: Token![union],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	    
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub fields: FieldsNamed,
@@ -401,7 +384,6 @@ impl From<DeriveInput> for Item {
                 attrs: input.attrs,
                 vis: input.vis,
                 struct_token: data.struct_token,
-		
                 ident: input.ident,
                 generics: input.generics,
                 fields: data.fields,
@@ -508,9 +490,7 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
     #[derive(serde::Serialize)]
     pub struct UsePath {
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon2_token: Token![::],
         pub tree: Box<UseTree>,
@@ -522,9 +502,7 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
          #[derive(serde::Serialize)]
     pub struct UseName {
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
     }
 }
@@ -534,14 +512,12 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
          #[derive(serde::Serialize)]
     pub struct UseRename {
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub as_token: Token![as],
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub rename: Ident,
     }
 }
@@ -633,9 +609,8 @@ ast_struct! {
         pub vis: Visibility,
         pub static_token: Token![static],
         pub mutability: StaticMutability,
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub colon_token: Token![:],
         pub ty: Box<Type>,
@@ -651,9 +626,8 @@ ast_struct! {
         pub attrs: Vec<Attribute>,
         pub vis: Visibility,
         pub type_token: Token![type],
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
 
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub semi_token: Token![;],
@@ -725,9 +699,7 @@ ast_struct! {
     pub struct TraitItemConst {
         pub attrs: Vec<Attribute>,
         pub const_token: Token![const],
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Token![:],
@@ -756,9 +728,7 @@ ast_struct! {
     pub struct TraitItemType {
         pub attrs: Vec<Attribute>,
         pub type_token: Token![type],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Option<Token![:]>,
@@ -835,9 +805,7 @@ ast_struct! {
         pub vis: Visibility,
         pub defaultness: Option<Token![default]>,
         pub const_token: Token![const],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub colon_token: Token![:],
@@ -870,9 +838,7 @@ ast_struct! {
         pub vis: Visibility,
         pub defaultness: Option<Token![default]>,
         pub type_token: Token![type],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub eq_token: Token![=],
@@ -903,9 +869,7 @@ ast_struct! {
         pub unsafety: Option<Token![unsafe]>,
         pub abi: Option<Abi>,
         pub fn_token: Token![fn],
-		#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Generics,
         pub paren_token: token::Paren,
@@ -1238,11 +1202,9 @@ pub(crate) mod parsing {
         vis: Visibility,
         defaultness: Option<Token![default]>,
         type_token: Token![type],
-	
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
+
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         ident: Ident,
-	
         generics: Generics,
         colon_token: Option<Token![:]>,
         bounds: Punctuated<TypeParamBound, Token![+]>,

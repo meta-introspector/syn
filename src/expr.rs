@@ -236,8 +236,6 @@ ast_enum_of_structs! {
         Unsafe(ExprUnsafe),
 
         /// Tokens in expression position not interpreted by Syn.
-	//#[serde(skip_serializing)]
-//	#[serde(skip_deserializing)]	
         Verbatim(String),
 
         /// A while loop: `while expr { ... }`.
@@ -973,9 +971,8 @@ ast_enum! {
     pub enum Member {
         /// A named field like `self.x`.
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
+	
         Named(Ident),
         /// An unnamed field like `self.0`.
         Unnamed(Index),
@@ -1045,9 +1042,7 @@ ast_struct! {
     pub struct Index {
         pub index: u32,
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_span")]
         pub span: Span,
     }
 }

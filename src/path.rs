@@ -219,9 +219,8 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
          #[derive(serde::Serialize)]
     pub struct AssocType {
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
 
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Option<AngleBracketedGenericArguments>,
         pub eq_token: Token![=],
@@ -235,9 +234,7 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
          #[derive(serde::Serialize)]
     pub struct AssocConst {
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Option<AngleBracketedGenericArguments>,
         pub eq_token: Token![=],
@@ -250,9 +247,7 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
          #[derive(serde::Serialize)]
     pub struct Constraint {
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_ident")]
         pub ident: Ident,
         pub generics: Option<AngleBracketedGenericArguments>,
         pub colon_token: Token![:],

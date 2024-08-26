@@ -198,9 +198,7 @@ ast_struct! {
         /// Name of the field, if any.
         ///
         /// Fields of tuple structs have no names.
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident")]
         pub ident: Option<Ident>,
 
         pub colon_token: Option<Token![:]>,
@@ -211,9 +209,7 @@ ast_struct! {
 
 #[derive(serde::Serialize)]
 pub struct Members<'a> {
-    #[serde(skip_serializing)]
-    #[serde(skip_deserializing)]
-
+    #[serde(serialize_with = "crate::serialize::serialize_punt_iter_field")]
     fields: punctuated::Iter<'a, Field>,
     index: u32,
 }

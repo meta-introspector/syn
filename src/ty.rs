@@ -258,9 +258,7 @@ ast_struct! {
          #[derive(serde::Serialize)]
     pub struct BareFnArg {
         pub attrs: Vec<Attribute>,
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident_token")]
         pub name: Option<(Ident, Token![:])>,
         pub ty: Type,
     }
@@ -272,9 +270,7 @@ ast_struct! {
          #[derive(serde::Serialize)]
     pub struct BareVariadic {
         pub attrs: Vec<Attribute>,
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_option_ident_token")]
         pub name: Option<(Ident, Token![:])>,
         pub dots: Token![...],
         pub comma: Option<Token![,]>,

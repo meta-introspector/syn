@@ -98,8 +98,7 @@ ast_struct! {
 #[derive(serde::Serialize)]
 pub struct LitRepr {
 
-    #[serde(skip_serializing)]
-    #[serde(skip_deserializing)]
+    #[serde(serialize_with = "crate::serialize::serialize_literal")]
     token: Literal,
     suffix: Box<str>,
 }
@@ -113,9 +112,7 @@ ast_struct! {
 }
 #[derive(serde::Serialize)]
 pub struct LitIntRepr {
-        #[serde(skip_serializing)]
-    #[serde(skip_deserializing)]
-
+    #[serde(serialize_with = "crate::serialize::serialize_literal")]
     token: Literal,
     digits: Box<str>,
     suffix: Box<str>,
@@ -132,9 +129,8 @@ ast_struct! {
 }
 #[derive(serde::Serialize)]
 pub struct LitFloatRepr {
-        #[serde(skip_serializing)]
-    #[serde(skip_deserializing)]
-
+    
+    #[serde(serialize_with = "crate::serialize::serialize_literal")]
     token: Literal,
     digits: Box<str>,
     suffix: Box<str>,
@@ -145,8 +141,7 @@ ast_struct! {
     #[derive(serde::Serialize)]
     pub struct LitBool {
         pub value: bool,
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
+	#[serde(serialize_with = "crate::serialize::serialize_span")]
 
         pub span: Span,
     }

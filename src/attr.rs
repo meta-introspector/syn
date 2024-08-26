@@ -475,11 +475,10 @@ ast_enum! {
         #[derive(serde::Serialize)]
     pub enum Meta {
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
-        Path(Path),
-
+	#[serde(serialize_with = "crate::serialize::serialize_path")]
+	Path(Path),
+	
+	#[serde(serialize_with = "crate::serialize::serialize_meta_list")]
         /// A structured list within an attribute, like `derive(Copy, Clone)`.
         List(MetaList),
 
@@ -493,13 +492,12 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
     #[derive(serde::Serialize)]
     pub struct MetaList {
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
+	
+	#[serde(serialize_with = "crate::serialize::serialize_path")]
         pub path: Path,
         pub delimiter: MacroDelimiter,
 
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
+	#[serde(serialize_with = "crate::serialize::serialize_token_stream")]
 
         pub tokens: TokenStream,
     }
@@ -510,9 +508,7 @@ ast_struct! {
     #[cfg_attr(docsrs, doc(cfg(any(feature = "full", feature = "derive"))))]
         #[derive(serde::Serialize)]
     pub struct MetaNameValue {
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_path")]
         pub path: Path,
         pub eq_token: Token![=],
         pub value: Expr,

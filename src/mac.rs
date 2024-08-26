@@ -19,9 +19,7 @@ ast_struct! {
         pub path: Path,
         pub bang_token: Token![!],
         pub delimiter: MacroDelimiter,
-	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
-
+	#[serde(serialize_with = "crate::serialize::serialize_token_stream")]
         pub tokens: TokenStream,
     }
 }

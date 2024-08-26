@@ -17,12 +17,10 @@ use std::hash::{Hash, Hasher};
 ///   property.
      #[derive(serde::Serialize)]
 pub struct Lifetime {
-    	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
 
+    #[serde(serialize_with = "crate::serialize::serialize_span")]
     pub apostrophe: Span,
-    	#[serde(skip_serializing)]
-	#[serde(skip_deserializing)]
+    #[serde(serialize_with = "crate::serialize::serialize_ident")]
 
     pub ident: Ident,
 }

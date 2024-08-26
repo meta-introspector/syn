@@ -210,9 +210,7 @@ macro_rules! define_keywords {
             /// [`Token!`]: crate::token
 	    #[derive(serde::Serialize)]
             pub struct $name {
-		#[serde(skip_serializing)]
-		#[serde(skip_deserializing)]
-
+		#[serde(serialize_with = "crate::serialize::serialize_span")]
                 pub span: Span,
             }
 
@@ -341,8 +339,8 @@ macro_rules! define_punctuation_structs {
             /// [`Token!`]: crate::token
 	    #[derive(serde::Serialize)]
             pub struct $name {
-		#[serde(skip_serializing)]
-		#[serde(skip_deserializing)]
+
+		#[serde(serialize_with = "crate::serialize::serialize_spans")]
                 pub spans: [Span; $len],
             }
 
@@ -453,9 +451,7 @@ macro_rules! define_delimiters {
             #[$doc]
 	        #[derive(serde::Serialize)]
             pub struct $name {
-		#[serde(skip_serializing)]
-		#[serde(skip_deserializing)]
-
+		#[serde(serialize_with = "crate::serialize::serialize_delimspan")]
                 pub span: DelimSpan,
             }
 
@@ -584,8 +580,7 @@ impl private::Sealed for Underscore {}
 /// None-delimited group
     #[derive(serde::Serialize)]
 pub struct Group {
-    #[serde(skip_serializing)]
-    #[serde(skip_deserializing)]
+    #[serde(serialize_with = "crate::serialize::serialize_span")]
     pub span: Span,
 }
 
