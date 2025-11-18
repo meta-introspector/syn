@@ -26,4 +26,4 @@ syn = { version = "2", features = ["derive", "full", "parsing", "printing"], def
 syn-codegen = { path = "../json", default-features = false }
 toml = { version = "0.9", default-features = false, features = ["parse", "serde"] }
 
-[workspace]
+#[workspace]

@@ -33,4 +33,4 @@ rustdoc-args = [
     "--extern-html-root-url=std=https://doc.rust-lang.org",
 ]
 
-[workspace]
+#[workspace]

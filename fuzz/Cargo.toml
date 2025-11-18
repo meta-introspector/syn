@@ -34,4 +34,4 @@ path = "fuzz_targets/parse_literal.rs"
 test = false
 doc = false
 
-[workspace]
+#[workspace]
